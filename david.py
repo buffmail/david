@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     while True:
         result = r.selection_get(selection="CLIPBOARD")
-        newText = result.split('\n')[0]
+        newText = result.split('\n')[0].strip(".")
         if newText != text:
             for url in (ENDIC_URL, DIC_URL):
                 webbrowser.open(url.format(newText))

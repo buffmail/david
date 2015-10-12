@@ -11,20 +11,23 @@ def openDic(keyword):
     for url in (ENDIC_URL, DIC_URL):
         webbrowser.open(url.format(keyword))
 
+def getClipboard(tk):
+    result = r.selection_get(selection="CLIPBOARD")
+    return result.split('\n')[0].strip(".")
+
 if __name__ == '__main__':
     if len(sys.argv) == 2:
         keyword = sys.argv[1]
         openDic(keyword)
         os.exit(0)
 
-    text = None
-
     r = Tk()
     r.withdraw()
 
+    text = getClipboard(r)
+
     while True:
-        result = r.selection_get(selection="CLIPBOARD")
-        newText = result.split('\n')[0].strip(".")
+        newText = getClipboard(r)
         if newText != text:
             openDic(newText)
             text = newText

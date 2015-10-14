@@ -18,12 +18,15 @@ def getClipboard(tk):
     return result.split('\n')[0].strip(".")
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='david.log', level=logging.INFO)
+    dir = os.path.dirname(os.path.realpath(__file__))
+    logPath = dir + '/david.log'
+
+    logging.basicConfig(filename=logPath, level=logging.INFO)
     logging.info('started with arg {}'.format(sys.argv))
-    if len(sys.argv) == 2:
-        keyword = sys.argv[1]
+    if (len(sys.argv) > 1):
+        keyword = ' '.join(sys.argv[1:])
         openDic(keyword)
-        os.exit(0)
+        sys.exit(0)
 
     r = Tk()
     r.withdraw()

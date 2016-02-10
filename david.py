@@ -9,9 +9,9 @@ ENDIC_URL = 'http://m.endic.naver.com/search.nhn?query={}&searchOption='
 DIC_URL = 'http://dictionary.reference.com/browse/{}?s=t'
 
 def openDic(rawKeyword):
-    keyword = rawKeyword.split('\n')[0].strip(".\r\n")
+    keyword = rawKeyword.split('\n')[0].strip(",.\r\n")
     logging.info('keyword [{}]'.format(keyword))
-    for url in (ENDIC_URL, DIC_URL):
+    for url in (DIC_URL, ENDIC_URL):
         webbrowser.open(url.format(keyword))
 
 def getClipboard(tk):

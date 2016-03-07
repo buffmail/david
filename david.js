@@ -6,32 +6,36 @@ var engword = 'ostensible'
 var urlbase = 'http://m.endic.naver.com/'
 var url1 = util.format("%ssearch.nhn?query=%s&searchOption=",
                        urlbase, engword);
+var url2 = ''
 
 var USER_AGENT = 'Mozilla/5.0 ' +
     '(Macintosh; Intel Mac OS X 10_10_1) ' +
     'AppleWebKit/537.36 (KHTML, like Gecko) ' +
     'Chrome/39.0.2171.99 Safari/537.36'
 
+var fnGetWordPage = function(err, res, html){
+    if (err){
+        console.log(err);
+        return;
+    }
+    var $ = cheerio.load(html);
+    var wordEntry = $("div.entry_word > h3.h_word").text();
+    console.log(wordEntry);
+    var pronoun = $("span.pronun").text();
+    console.log(pronoun);
+    console.log($("li.example_itm > p.example_stc").text());
+}
+
 request(
     url1,
-    function(err, res, html)
-    {
+    function(err, res, html){
         var $ = cheerio.load(html);
         var formTag = $("form")[0]
-        var url2 = urlbase + formTag['attribs']['action']
-        console.log(url2)
-
+        url2 = urlbase + formTag['attribs']['action']
         request(
             {url:url2, headers:{'User-Agent': USER_AGENT}},
-            function(err, res, html)
-            {
-                if (err)
-                {
-                    console.log(err);
-                    return;
-                }
-                console.log(html);
-            }
+            fnGetWordPage
         );
     }
 );
+

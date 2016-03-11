@@ -15,18 +15,19 @@
 
          socket.on('onReadExamples', function(data){
              examples = data.data
+             $('#id_examples').empty();
              for (var i in examples)
              {
                  $('#id_examples').append(
                      "<li>" +
                      "<span>" + examples[i].example + "</span>" +
-                     "<input type='button' value='click' onclick='fnClick(this);'/>" +
+                     "<input type='button' value='click' onclick='fnClick(" + i + ");'/>" +
                      "</li>");
              }
          });
 
-         var fnClick = function(obj){
-             var text = $(obj).parent().text();
+         var fnClick = function(id){
+             var text = examples[id].example;
              var speaker = "US English Male";
              responsiveVoice.speak(text, speaker);
          }

@@ -2,7 +2,7 @@ var request = require('request');
 var cheerio = require('cheerio');
 var util = require('util');
 
-var engword = 'ostensible'
+var engword = 'word'
 var urlbase = 'http://m.endic.naver.com/'
 var url1 = util.format("%ssearch.nhn?query=%s&searchOption=",
                        urlbase, engword);
@@ -23,7 +23,21 @@ var fnGetWordPage = function(err, res, html){
     console.log(wordEntry);
     var pronoun = $("span.pronun").text();
     console.log(pronoun);
-    console.log($("li.example_itm > p.example_stc").text());
+    var sentence = ''
+    $("li.example_itm > p.example_stc > span.autolink > a").each(
+        function(){
+            if ($(this).hasClass("hidden")){
+//                return;
+            }
+            if (sentence.length != 0) {
+                sentence += ' ';
+            }
+            sentence += $(this).text();
+        });
+    if (sentence.length){
+        sentence += ".";
+    }
+    console.log(sentence);
 }
 
 request(

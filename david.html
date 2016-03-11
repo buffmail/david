@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <script
+            src='https://code.responsivevoice.org/responsivevoice.js'>
+        </script>
+        <script
+            src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script
+            src='/socket.io/socket.io.js'>
+        </script>
+        <script>
+         var socket = io.connect('http://localhost:8080');
+         var examples = {}
+         socket.emit('register', {});
+
+         socket.on('onReadExamples', function(data){
+             examples = data.data
+             for (var i in examples)
+             {
+                 $('#id_examples').append(
+                     "<li>" +
+                     "<span>" + examples[i].example + "</span>" +
+                     "<input type='button' value='click' onclick='fnClick(this);'/>" +
+                     "</li>");
+             }
+         });
+
+         var fnClick = function(obj){
+             var text = $(obj).parent().text();
+             var speaker = "US English Male";
+             responsiveVoice.speak(text, speaker);
+         }
+        </script>
+    </head>
+
+    <body>
+        <ul id="id_examples">
+        </ul>
+        <p id="id_log"/>
+    </body>
+
+</html>

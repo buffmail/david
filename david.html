@@ -2,39 +2,39 @@
     <head>
         <script
             src='https://code.responsivevoice.org/responsivevoice.js'>
-        </script>
-        <script
-            src="http://code.jquery.com/jquery-1.11.1.js"></script>
-        <script
-            src='/socket.io/socket.io.js'>
-        </script>
+         </script>
+        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script src='/socket.io/socket.io.js'></script>
         <script>
+
          var socket = io.connect('http://localhost:8080');
-         var examples = {}
-         var fnSpeak = function(index){
-             var text = examples[index].example;
+
+         var fnSpeak = function(example){
              var speaker = "US English Male";
-             responsiveVoice.speak(text, speaker);
+             responsiveVoice.speak(example, speaker);
          };
 
          socket.emit('register', {});
 
          socket.on('onReadExamples', function(data){
-             examples = data.data
+             var examples = data.data;
              $('#id_examples').empty();
+
              for (var i in examples)
              {
                  var example = examples[i].example;
                  var word = examples[i].word;
+                 var sentence = example.replace(
+                     word,
+                     $('<strong/>').text(word).prop('outerHTML'));
 
-                 var $span = $('<span/>').text(example);
                  var $input = $('<input/>',
                                 {type: 'button', value: 'sound'});
-                 $input.click(fnSpeak.bind(this, i));
+                 $input.click(fnSpeak.bind(this, example));
 
                  $('#id_examples').append(
                      $('<li/>')
-                         .append($span)
+                         .append(sentence)
                          .append($input)
                          );
              }

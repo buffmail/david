@@ -11,6 +11,12 @@
         <script>
          var socket = io.connect('http://localhost:8080');
          var examples = {}
+         var fnSpeak = function(index){
+             var text = examples[index].example;
+             var speaker = "US English Male";
+             responsiveVoice.speak(text, speaker);
+         };
+
          socket.emit('register', {});
 
          socket.on('onReadExamples', function(data){
@@ -18,19 +24,21 @@
              $('#id_examples').empty();
              for (var i in examples)
              {
+                 var example = examples[i].example;
+                 var word = examples[i].word;
+
+                 var $span = $('<span/>').text(example);
+                 var $input = $('<input/>',
+                                {type: 'button', value: 'sound'});
+                 $input.click(fnSpeak.bind(this, i));
+
                  $('#id_examples').append(
-                     "<li>" +
-                     "<span>" + examples[i].example + "</span>" +
-                     "<input type='button' value='click' onclick='fnClick(" + i + ");'/>" +
-                     "</li>");
+                     $('<li/>')
+                         .append($span)
+                         .append($input)
+                         );
              }
          });
-
-         var fnClick = function(id){
-             var text = examples[id].example;
-             var speaker = "US English Male";
-             responsiveVoice.speak(text, speaker);
-         }
         </script>
     </head>
 

@@ -7,17 +7,18 @@
         <script src='/socket.io/socket.io.js'></script>
         <script>
 
-         var socket = io.connect('http://localhost:8080');
-
          var fnSpeak = function(example){
              var speaker = "US English Male";
              responsiveVoice.speak(example, speaker);
          };
 
+         var socket = io.connect('http://localhost:8080');
          socket.emit('register', {});
+         socket.on('onReadExamples', function(jsonData){
+             var date = jsonData.date;
+             var examples = jsonData.data;
 
-         socket.on('onReadExamples', function(data){
-             var examples = data.data;
+             $('#id_date').text(date);
              $('#id_examples').empty();
 
              for (var i in examples)
@@ -38,13 +39,35 @@
                          .append($input)
                          );
              }
+
+             var fnPlayNextSentence = function(e, currIdx){
+                 if (!(currIdx in e)){
+                     $('#id_play_all').prop('value', 'Play ALL');
+                     return;
+                 }
+
+                 var sentence = e[currIdx].example;
+                 var word = e[currIdx].word;
+                 var speaker = "US English Male";
+                 var fnNextPlay = fnPlayNextSentence.bind(this,
+                                                          e, currIdx+1);
+                 responsiveVoice.speak(sentence, speaker,
+                                       {onend:fnNextPlay});
+                 $('#id_play_all').prop('value', 'Playing ' + word);
+             }
+
+              $('#id_play_all').click(function(){
+                  fnPlayNextSentence(examples, 0);
+              });
          });
         </script>
     </head>
 
     <body>
+        <h3 id="id_date"> date </h3>
         <ul id="id_examples">
         </ul>
+        <input id='id_play_all' type='button' value='Play ALL'/>
         <p id="id_log"/>
     </body>
 

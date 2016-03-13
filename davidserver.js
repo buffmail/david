@@ -39,27 +39,31 @@ server.listen(PORT);
 
 var io2 = io.listen(server);
 
-var fnGetDay = function(dayOffset){
+function fnGetDay(dayOffset){
     var d = new Date();
     d.setDate(d.getDate() + dayOffset);
     return Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
 }
 
-var fnGetDayJson = function(jsonObjs, day){
-    if (jsonObjs.length == 0){
-        return {}
-    }
+function fnGetDayJson(jsonObjs, dayOffset){
+
+    var reqDays = fnGetDay(dayOffset);
+    var nowDays = fnGetDay(0);
 
     for (var i in jsonObjs)
     {
         var jsonObj = jsonObjs[i];
         var d = new Date(jsonObj.date);
         var days = Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
-        if (days == day){
-            return jsonObj;
+        if (reqDays < days || i == jsonObjs.length - 1) {
+            return [days - nowDays, jsonObj];
+        }
+        if (reqDays == days) {
+            return [dayOffset, jsonObj];
         }
     }
-    return jsonObjs[jsonObjs.length - 1];
+
+    return [0, null];
 }
 
 io2.sockets.on('connection', function(socket){
@@ -69,9 +73,16 @@ io2.sockets.on('connection', function(socket){
         console.log("disconnected " + connId);
     });
     socket.on('req_example', function(data){
-        var day = fnGetDay(data.day_offset);
-        var jsonObj = fnGetDayJson(jsonObjs, day);
-        jsonObj.day_offset = data.day_offset;
+        console.log('---');
+        var reqDayOffset = data.day_offset;
+        var ret = fnGetDayJson(jsonObjs, reqDayOffset);
+        var dayOffset = ret[0];
+        var jsonObj = ret[1];
+        if (!jsonObj){
+            console.log('empty json data');
+            return;
+        }
+        jsonObj.day_offset = dayOffset;
         socket.emit('res_example', jsonObj);
     });
 });

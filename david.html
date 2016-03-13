@@ -7,64 +7,85 @@
         <script src='/socket.io/socket.io.js'></script>
         <script>
 
+         var dayOffset = 0;
+         var examples = {};
+
          var fnSpeak = function(example){
              var speaker = "US English Male";
              responsiveVoice.speak(example, speaker);
          };
 
          var socket = io.connect('http://localhost:8080');
-         socket.emit('register', {});
-         socket.on('onReadExamples', function(jsonData){
-             var date = jsonData.date;
-             var examples = jsonData.data;
 
-             $('#id_date').text(date);
-             $('#id_examples').empty();
+         var fnPlayNextSentence = function(e, currIdx){
+             if (!(currIdx in e)){
+                 $('#id_play_all').prop('value', 'Play ALL');
+                 return;
+             }
 
-             for (var i in examples)
-             {
-                 var example = examples[i].example;
-                 var word = examples[i].word;
-                 var sentence = example.replace(
-                     word,
-                     $('<strong/>').text(word).prop('outerHTML'));
+             var sentence = e[currIdx].example;
+             var word = e[currIdx].word;
+             var speaker = "US English Male";
+             var fnNextPlay = fnPlayNextSentence.bind(this,
+                                                      e, currIdx+1);
+             responsiveVoice.speak(sentence, speaker,
+                                   {onend:fnNextPlay});
+             $('#id_play_all').prop('value', 'Playing ' + word);
+         };
 
-                 var $input = $('<input/>',
-                                {type: 'button', value: 'sound'});
-                 $input.click(fnSpeak.bind(this, example));
+         $(document).ready(function(){
+             socket.emit('req_example', {day_offset:0});
+             socket.on('res_example', function(jsonData){
+                 console.log(jsonData);
+                 window.dayOffset = jsonData.day_offset;
+                 examples = jsonData.data;
 
-                 $('#id_examples').append(
-                     $('<li/>')
+                 $('#id_date').text(jsonData.date);
+                 $('#id_examples').empty();
+
+                 for (var i in examples)
+                 {
+                     var example = examples[i].example;
+                     var word = examples[i].word;
+                     var sentence = example.replace(
+                         word,
+                         $('<strong/>').text(word).prop('outerHTML'));
+
+                     var $input = $('<input/>',
+                                    {type: 'button', value: 'sound'});
+                     $input.click(fnSpeak.bind(this, example));
+
+                     $('#id_examples').append(
+                         $('<li/>')
                          .append(sentence)
                          .append($input)
-                         );
-             }
-
-             var fnPlayNextSentence = function(e, currIdx){
-                 if (!(currIdx in e)){
-                     $('#id_play_all').prop('value', 'Play ALL');
-                     return;
+                     );
                  }
 
-                 var sentence = e[currIdx].example;
-                 var word = e[currIdx].word;
-                 var speaker = "US English Male";
-                 var fnNextPlay = fnPlayNextSentence.bind(this,
-                                                          e, currIdx+1);
-                 responsiveVoice.speak(sentence, speaker,
-                                       {onend:fnNextPlay});
-                 $('#id_play_all').prop('value', 'Playing ' + word);
-             }
+             });
 
-              $('#id_play_all').click(function(){
-                  fnPlayNextSentence(examples, 0);
-              });
+             $('#id_play_all').click(function(){
+                 fnPlayNextSentence(examples, 0);
+             });
+
+             $('#id_btn_day_prev').click(function(){
+                 socket.emit('req_example', {day_offset:dayOffset-1});
+             });
+
+             $('#id_btn_day_next').click(function(){
+                 socket.emit('req_example', {day_offset:dayOffset+1});
+             });
          });
+
         </script>
     </head>
 
     <body>
-        <h3 id="id_date"> date </h3>
+        <p>
+            <input id="id_btn_day_prev" type="button" value="prev"/>
+            <span id="id_date"> date </span>
+            <input id="id_btn_day_next" type="button" value="next"/>
+        </p>
         <ul id="id_examples">
         </ul>
         <input id='id_play_all' type='button' value='Play ALL'/>

@@ -36,7 +36,6 @@
          $(document).ready(function(){
              socket.emit('req_example', {day_offset:0});
              socket.on('res_example', function(jsonData){
-                 console.log(jsonData);
                  window.dayOffset = jsonData.day_offset;
                  examples = jsonData.data;
 
@@ -75,6 +74,13 @@
              $('#id_btn_day_next').click(function(){
                  socket.emit('req_example', {day_offset:dayOffset+1});
              });
+
+             $('#id_btn_send_new_example').click(function(){
+                 var example = $('#id_new_example').val();
+                 if (example.length == 0)
+                     return;
+                 socket.emit('add_example', {example:example});
+             });
          });
 
         </script>
@@ -88,8 +94,14 @@
         </p>
         <ul id="id_examples">
         </ul>
-        <input id='id_play_all' type='button' value='Play ALL'/>
+        <p>
+          <input id='id_play_all' type='button' value='Play ALL'/>
+        </p>
         <p id="id_log"/>
+        <p>
+          <input id='id_new_example' type='text' size="100"/>
+          <input id='id_btn_send_new_example' type='button' value="send"/>
+        </p>
     </body>
 
 </html>

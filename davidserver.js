@@ -5,9 +5,10 @@ var io = require('socket.io');
 
 const PORT=8080;
 const mainHtmlPath = __dirname + "/david.html";
+const JSON_FILE_NAME = 'data.json';
 console.log(mainHtmlPath);
 
-var jsonObjs = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+var jsonObjs = JSON.parse(fs.readFileSync(JSON_FILE_NAME, 'utf8'));
 
 var server = http.createServer(function(request, response){
     var path = url.parse(request.url).pathname;
@@ -46,7 +47,6 @@ function fnGetDay(dayOffset){
 }
 
 function fnGetDayJson(jsonObjs, dayOffset){
-
     var reqDays = fnGetDay(dayOffset);
     var nowDays = fnGetDay(0);
 
@@ -66,6 +66,35 @@ function fnGetDayJson(jsonObjs, dayOffset){
     return [0, null];
 }
 
+function AddExample(jsonObjs, example){
+    var nowDays = fnGetDay(0);
+
+    var resultJsonObj = null;
+
+    for (var i in jsonObjs)
+    {
+        var jsonObj = jsonObjs[i];
+        var d = new Date(jsonObj.date);
+        var days = Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
+
+        if (days == nowDays) {
+            resultJsonObj = jsonObj;
+            break;
+        }
+    }
+
+    if (!resultJsonObj){
+        var d = new Date();
+        var dateStr = d.getFullYear() + '-' +
+            (d.getMonth() + 1) + '-' +
+            d.getDate();
+        resultJsonObj = {date:dateStr, data:[]};
+    }
+    resultJsonObj.data.push({word:'', example:example});
+    fs.writeFile(JSON_FILE_NAME, JSON.stringify(jsonObjs, null, 4));
+    return resultJsonObj;
+}
+
 io2.sockets.on('connection', function(socket){
     var connId = socket.conn.id;
     console.log("connected " + connId);
@@ -73,7 +102,6 @@ io2.sockets.on('connection', function(socket){
         console.log("disconnected " + connId);
     });
     socket.on('req_example', function(data){
-        console.log('---');
         var reqDayOffset = data.day_offset;
         var ret = fnGetDayJson(jsonObjs, reqDayOffset);
         var dayOffset = ret[0];
@@ -82,7 +110,15 @@ io2.sockets.on('connection', function(socket){
             console.log('empty json data');
             return;
         }
-        jsonObj.day_offset = dayOffset;
-        socket.emit('res_example', jsonObj);
+        var retJsonObj = JSON.parse(JSON.stringify(jsonObj));
+        retJsonObj.day_offset = dayOffset;
+        socket.emit('res_example', retJsonObj);
+    });
+    socket.on('add_example', function(data){
+        var example = data.example;
+        var jsonObj = AddExample(jsonObjs, example);
+        var retJsonObj = JSON.parse(JSON.stringify(jsonObj));
+        retJsonObj.day_offset = 0;
+        socket.emit('res_example', retJsonObj);
     });
 });

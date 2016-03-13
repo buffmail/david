@@ -1,60 +1,68 @@
 [
     {
-        "date":"2016-03-11",
-        "data":[
+        "date": "2016-03-11",
+        "data": [
             {
-                "word":"ostensible",
-                "example":"The ostensible reason for his absence was illness."
+                "word": "ostensible",
+                "example": "The ostensible reason for his absence was illness."
             },
             {
-                "word":"formidable",
-                "example":"In debate he was a formidable opponent."
+                "word": "formidable",
+                "example": "In debate he was a formidable opponent."
             },
             {
-                "word":"perspiration",
-                "example":"Beads of perspiration stood out on his forehead."
+                "word": "perspiration",
+                "example": "Beads of perspiration stood out on his forehead."
             },
             {
-                "word":"retail",
-                "example":"The recommended retail price is ￡9.99."
+                "word": "retail",
+                "example": "The recommended retail price is ￡9.99."
             }
         ]
     },
     {
-        "date":"2016-03-12",
-        "data":[
+        "date": "2016-03-12",
+        "data": [
             {
-                "word":"ostensible",
-                "example":"The ostensible reason for his absence was illness."
+                "word": "ostensible",
+                "example": "The ostensible reason for his absence was illness."
             },
             {
-                "word":"formidable",
-                "example":"In debate he was a formidable opponent."
+                "word": "formidable",
+                "example": "In debate he was a formidable opponent."
             },
             {
-                "word":"perspiration",
-                "example":"Beads of perspiration stood out on his forehead."
+                "word": "perspiration",
+                "example": "Beads of perspiration stood out on his forehead."
             },
             {
-                "word":"retail",
-                "example":"The recommended retail price is ￡9.99."
+                "word": "retail",
+                "example": "The recommended retail price is ￡9.99."
             }
         ]
     },
     {
-        "date":"2016-03-13",
-        "data":[
+        "date": "2016-03-13",
+        "data": [
             {
-                "word":"ostensible",
-                "example":"The ostensible reason for his absence was illness."
+                "word": "ostensible",
+                "example": "The ostensible reason for his absence was illness."
             },
             {
-                "word":"formidable",
-                "example":"In debate he was a formidable opponent."
+                "word": "formidable",
+                "example": "In debate he was a formidable opponent."
             },
             {
-                "word":"perspiration",
-                "example":"Beads of perspiration stood out on his forehead."
+                "word": "perspiration",
+                "example": "Beads of perspiration stood out on his forehead."
+            },
+            {
+                "word": "",
+                "example": "The rebel soldiers were forced to surrender."
+            },
+            {
+                "word": "",
+                "example": "It is a grave situation when a people resign their citizenship."
             }
         ]
     }

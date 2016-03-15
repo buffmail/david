@@ -89,6 +89,7 @@ function AddExample(jsonObjs, example){
             (d.getMonth() + 1) + '-' +
             d.getDate();
         resultJsonObj = {date:dateStr, data:[]};
+        jsonObjs.push(resultJsonObj);
     }
     resultJsonObj.data.push({word:'', example:example});
     fs.writeFile(JSON_FILE_NAME, JSON.stringify(jsonObjs, null, 4));

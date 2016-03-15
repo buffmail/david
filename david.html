@@ -15,7 +15,7 @@
              responsiveVoice.speak(example, speaker);
          };
 
-         var socket = io.connect('http://localhost:8080');
+         var socket = io.connect('http://' + location.host);
 
          var fnPlayNextSentence = function(e, currIdx){
              if (!(currIdx in e)){

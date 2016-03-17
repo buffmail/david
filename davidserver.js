@@ -6,7 +6,6 @@ var io = require('socket.io');
 const PORT=8080;
 const mainHtmlPath = __dirname + "/david.html";
 const JSON_FILE_NAME = 'data.json';
-console.log(mainHtmlPath);
 
 var jsonObjs = JSON.parse(fs.readFileSync(JSON_FILE_NAME, 'utf8'));
 
@@ -46,23 +45,21 @@ function fnGetDay(date, dayOffset){
     return Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
 }
 
-function fnGetDayJson(jsonObjs, dayOffset){
+function fnGetDayJson(jsonObjs, dayOffset, prevSide){
     var today = new Date();
     var reqDays = fnGetDay(today, dayOffset);
     var nowDays = fnGetDay(today, 0);
-    console.log('reqDays', reqDays, 'nowDays', nowDays);
 
     for (var i in jsonObjs)
     {
         var jsonObj = jsonObjs[i];
         var days = fnGetDay(jsonObj.date, 0);
-        console.log('days', days);
         if (reqDays < days) {
-            console.log('condition 1');
             if (i == 0) {
                 return [days - nowDays, jsonObj];
             }
-            jsonObj = jsonObjs[i-1];
+            var idx = prevSide ? i - 1 : i;
+            jsonObj = jsonObjs[idx];
             days = fnGetDay(jsonObj.date, 0);
             return [days - nowDays, jsonObj];
         }
@@ -70,7 +67,6 @@ function fnGetDayJson(jsonObjs, dayOffset){
             return [days - nowDays, jsonObj];
         }
         if (reqDays == days) {
-            console.log('condition 2, reqDays', reqDays);
             return [dayOffset, jsonObj];
         }
     }
@@ -115,7 +111,8 @@ io2.sockets.on('connection', function(socket){
     });
     socket.on('req_example', function(data){
         var reqDayOffset = data.day_offset;
-        var ret = fnGetDayJson(jsonObjs, reqDayOffset);
+        var delta = data.delta;
+        var ret = fnGetDayJson(jsonObjs, reqDayOffset + delta, delta < 0);
         var dayOffset = ret[0];
         var jsonObj = ret[1];
         if (!jsonObj){

@@ -36,7 +36,7 @@
          };
 
          $(document).ready(function(){
-             socket.emit('req_example', {day_offset:0});
+             socket.emit('req_example', {day_offset:0, delta:0});
              socket.on('res_example', function(jsonData){
                  window.dayOffset = jsonData.day_offset;
                  examples = jsonData.data;
@@ -70,11 +70,13 @@
              });
 
              $('#id_btn_day_prev').click(function(){
-                 socket.emit('req_example', {day_offset:dayOffset-1});
+                 socket.emit('req_example',
+                     {day_offset:dayOffset, delta:-1});
              });
 
              $('#id_btn_day_next').click(function(){
-                 socket.emit('req_example', {day_offset:dayOffset+1});
+                 socket.emit('req_example',
+                     {day_offset:dayOffset, delta:1});
              });
 
              $('#id_btn_send_new_example').click(function(){

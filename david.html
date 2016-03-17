@@ -11,18 +11,30 @@
 
          var dayOffset = 0;
          var examples = {};
+         var ttsStop = false;
 
          var fnSpeak = function(example){
              var speaker = "US English Male";
-             responsiveVoice.speak(example, speaker);
+             var onNext = function(){
+                setTimeout(fnSpeak.bind(this, example), 3000);
+             };
+             if (ttsStop){
+                ttsStop = false;
+                return;
+             }
+             responsiveVoice.speak(example, speaker, {onend:onNext});
          };
 
          var socket = io.connect('http://' + location.host);
 
          var fnPlayNextSentence = function(e, currIdx){
              if (!(currIdx in e)){
-                 $('#id_play_all').prop('value', 'Play ALL');
-                 return;
+                 if (currIdx == 0){
+                    console.log("Empty examples?");
+                    return;
+                 }
+
+                 currIdx = 0;
              }
 
              var sentence = e[currIdx].example;
@@ -38,7 +50,8 @@
          $(document).ready(function(){
              socket.emit('req_example', {day_offset:0, delta:0});
              socket.on('res_example', function(jsonData){
-                 window.dayOffset = jsonData.day_offset;
+                 ttsStop = false;
+                 dayOffset = jsonData.day_offset;
                  examples = jsonData.data;
 
                  $('#id_date').text(jsonData.date);
@@ -54,7 +67,12 @@
 
                      var $input = $('<input/>',
                                     {type: 'button', value: 'sound'});
-                     $input.click(fnSpeak.bind(this, example));
+                     var fnPlay = function(e){
+                         ttsStop = false;
+                         fnSpeak(e);
+                     };
+
+                     $input.click(fnPlay.bind(this, example));
 
                      $('#id_examples').append(
                          $('<li/>')
@@ -67,6 +85,12 @@
 
              $('#id_play_all').click(function(){
                  fnPlayNextSentence(examples, 0);
+             });
+
+             $('#id_play_stop').click(function(){
+                 ttsStop = true;
+                 responsiveVoice.cancel();
+                 $('#id_play_all').prop('value', 'Play ALL');
              });
 
              $('#id_btn_day_prev').click(function(){
@@ -100,6 +124,7 @@
         </ul>
         <p>
           <input id='id_play_all' type='button' value='Play ALL'/>
+          <input id='id_play_stop' type='button' value='stop current play'/>
         </p>
         <p id="id_log"/>
         <p>

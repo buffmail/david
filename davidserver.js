@@ -40,25 +40,37 @@ server.listen(PORT);
 
 var io2 = io.listen(server);
 
-function fnGetDay(dayOffset){
-    var d = new Date();
+function fnGetDay(date, dayOffset){
+    var d = new Date(date);
     d.setDate(d.getDate() + dayOffset);
     return Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
 }
 
 function fnGetDayJson(jsonObjs, dayOffset){
-    var reqDays = fnGetDay(dayOffset);
-    var nowDays = fnGetDay(0);
+    var today = new Date();
+    var reqDays = fnGetDay(today, dayOffset);
+    var nowDays = fnGetDay(today, 0);
+    console.log('reqDays', reqDays, 'nowDays', nowDays);
 
     for (var i in jsonObjs)
     {
         var jsonObj = jsonObjs[i];
-        var d = new Date(jsonObj.date);
-        var days = Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
-        if (reqDays < days || i == jsonObjs.length - 1) {
+        var days = fnGetDay(jsonObj.date, 0);
+        console.log('days', days);
+        if (reqDays < days) {
+            console.log('condition 1');
+            if (i == 0) {
+                return [days - nowDays, jsonObj];
+            }
+            jsonObj = jsonObjs[i-1];
+            days = fnGetDay(jsonObj.date, 0);
+            return [days - nowDays, jsonObj];
+        }
+        if (i == jsonObjs.length - 1) {
             return [days - nowDays, jsonObj];
         }
         if (reqDays == days) {
+            console.log('condition 2, reqDays', reqDays);
             return [dayOffset, jsonObj];
         }
     }
@@ -74,8 +86,7 @@ function AddExample(jsonObjs, example){
     for (var i in jsonObjs)
     {
         var jsonObj = jsonObjs[i];
-        var d = new Date(jsonObj.date);
-        var days = Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
+        var days = fnGetDays(jsonObj.date, 0);
 
         if (days == nowDays) {
             resultJsonObj = jsonObj;

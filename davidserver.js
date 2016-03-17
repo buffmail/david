@@ -75,14 +75,14 @@ function fnGetDayJson(jsonObjs, dayOffset, prevSide){
 }
 
 function AddExample(jsonObjs, example){
-    var nowDays = fnGetDay(0);
+    var nowDays = fnGetDay(new Date(), 0);
 
     var resultJsonObj = null;
 
     for (var i in jsonObjs)
     {
         var jsonObj = jsonObjs[i];
-        var days = fnGetDays(jsonObj.date, 0);
+        var days = fnGetDay(jsonObj.date, 0);
 
         if (days == nowDays) {
             resultJsonObj = jsonObj;

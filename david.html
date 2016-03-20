@@ -104,10 +104,12 @@
              });
 
              $('#id_btn_send_new_example').click(function(){
-                 var example = $('#id_new_example').val();
+                 var inputElem = $('#id_new_example');
+                 var example = inputElem.val();
                  if (example.length == 0)
                      return;
                  socket.emit('add_example', {example:example});
+                 inputElem.val('');
              });
          });
 

@@ -25,18 +25,22 @@ def adjustWinPos():
             return
         className = win32gui.GetClassName(hwnd)
         if className == name:
-            logging.info('found {} hwnd {}'.format(name, hwnd))
+            logging.info('found {} '.format(name))
             adjustWinPos.chromeWin = hwnd
 
     win32gui.EnumWindows(callback, 'Chrome_WidgetWin_1')
 
     if adjustWinPos.chromeWin:
-        hw = win32api.GetSystemMetrics(0) / 2
+        halfWidth = win32api.GetSystemMetrics(0) / 2
         height = win32api.GetSystemMetrics(1)
         cursorX, _ = win32api.GetCursorPos()
-        xPos = 0 if (cursorX > hw) else hw
+        leftSide = (cursorX > halfWidth)
+        xPos = 0 if leftSide else halfWidth
         win32gui.MoveWindow(adjustWinPos.chromeWin,
-                            xPos, 0, hw, height, True)
+                            xPos, 0, halfWidth, height, True)
+        logging.info(
+            'moving window {} side'.format(
+                'left' if leftSide else 'right'))
 
 def getClipboard(r):
     result = r.selection_get(selection="CLIPBOARD")
@@ -68,13 +72,15 @@ if __name__ == '__main__':
     dir = os.path.dirname(os.path.realpath(__file__))
     logPath = dir + '/david.log'
 
-    logging.basicConfig(filename=logPath, level=logging.INFO)
-    logging.info('')
+    logging.basicConfig(filename=logPath, level=logging.INFO
+                        , format='%(asctime)s %(message)s'
+                        , datefmt='[%m/%d/%Y %I:%M:%S]')
     logging.info('started with arg {}'.format(sys.argv))
 
     try:
         main()
         logging.info('exit')
+        logging.info('')
     except:
         tb = traceback.format_exc()
         logging.error(str(tb))

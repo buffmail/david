@@ -6,6 +6,7 @@ import logging
 import win32gui
 import win32api
 from Tkinter import Tk
+import traceback
 
 ENDIC_URL = 'http://m.endic.naver.com/search.nhn?query={}&searchOption='
 DIC_URL = 'http://dictionary.reference.com/browse/{}?s=t'
@@ -38,7 +39,7 @@ def adjustWinPos():
         win32gui.MoveWindow(adjustWinPos.chromeWin,
                             xPos, 0, hw, height, True)
 
-def getClipboard(tk):
+def getClipboard(r):
     result = r.selection_get(selection="CLIPBOARD")
     return result
 
@@ -73,5 +74,6 @@ if __name__ == '__main__':
 
     try:
         main()
-    except Exception as e:
-        logging.warn('{}', e)
+    except Exception:
+        tb = traceback.format_exc()
+        logging.error(str(tb))

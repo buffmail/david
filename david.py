@@ -34,8 +34,7 @@ def adjustWinPos():
         hw = win32api.GetSystemMetrics(0) / 2
         height = win32api.GetSystemMetrics(1)
         cursorX, _ = win32api.GetCursorPos()
-        xPos = (cursorX < hw) and 0 or hw
-        logging.info('cursorX {} hw {} pos {}'.format(cursorX, hw, xPos))
+        xPos = 0 if (cursorX > hw) else hw
         win32gui.MoveWindow(adjustWinPos.chromeWin,
                             xPos, 0, hw, height, True)
 
@@ -48,7 +47,7 @@ def main():
         keyword = ' '.join(sys.argv[1:])
         openDic(keyword)
         adjustWinPos()
-        sys.exit(0)
+        return
 
     r = Tk()
     r.withdraw()
@@ -70,10 +69,12 @@ if __name__ == '__main__':
     logPath = dir + '/david.log'
 
     logging.basicConfig(filename=logPath, level=logging.INFO)
+    logging.info('')
     logging.info('started with arg {}'.format(sys.argv))
 
     try:
         main()
-    except Exception:
+        logging.info('exit')
+    except:
         tb = traceback.format_exc()
         logging.error(str(tb))

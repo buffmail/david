@@ -4,8 +4,15 @@
               content="width=device-width, initial-scale=1.0" />
         <script
             src='https://code.responsivevoice.org/responsivevoice.js'>
-         </script>
-        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        </script>
+        <link rel="stylesheet"
+              href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+        <script
+            src="http://code.jquery.com/jquery-1.11.3.min.js">
+        </script>
+        <script
+            src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js">
+        </script>
         <script src='/socket.io/socket.io.js'></script>
         <script>
 
@@ -75,11 +82,12 @@
                      $input.click(fnPlay.bind(this, example));
 
                      $('#id_examples').append(
-                         $('<li/>')
+                         $('<li style="white-space: normal;"/>')
                          .append(sentence)
                          .append($input)
                      );
                  }
+                 $('#id_examples').listview('refresh');
 
              });
 
@@ -117,12 +125,15 @@
     </head>
 
     <body>
-        <p>
-            <input id="id_btn_day_prev" type="button" value="prev"/>
+        <div data-role="controlgroup"
+             data-type="horizontal" style="text-align:center;">
+            <input id="id_btn_day_prev" type="button"
+                   data-inline="true" value="prev"/>
             <span id="id_date"> date </span>
-            <input id="id_btn_day_next" type="button" value="next"/>
-        </p>
-        <ul id="id_examples">
+            <input id="id_btn_day_next" type="button"
+                   data-inline="true" value="next"/>
+        </div>
+        <ul id="id_examples" data-role="listview" data-theme="g">
         </ul>
         <p>
           <input id='id_play_all' type='button' value='Play ALL'/>

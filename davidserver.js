@@ -46,7 +46,8 @@ function fnGetDay(date, dayOffset){
 }
 
 function fnGetDayJson(jsonObjs, dayOffset, prevSide){
-    var today = new Date();
+    var n = new Date()
+    var today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
     var reqDays = fnGetDay(today, dayOffset);
     var nowDays = fnGetDay(today, 0);
 
@@ -75,7 +76,10 @@ function fnGetDayJson(jsonObjs, dayOffset, prevSide){
 }
 
 function AddExample(jsonObjs, example){
-    var nowDays = fnGetDay(new Date(), 0);
+    var n = new Date()
+    var nowDays = fnGetDay(
+        new Date(n.getFullYear(), n.getMonth(), n.getDate())
+        , 0);
 
     var resultJsonObj = null;
 

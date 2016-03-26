@@ -72,23 +72,18 @@
                          word,
                          $('<strong/>').text(word).prop('outerHTML'));
 
-                     var $input = $('<input/>',
-                                    {type: 'button', value: 'sound'});
-                     var fnPlay = function(e){
-                         ttsStop = false;
-                         fnSpeak(e);
-                     };
-
-                     $input.click(fnPlay.bind(this, example));
-
                      $('#id_examples').append(
                          $('<li style="white-space: normal;"/>')
                          .append(sentence)
-                         .append($input)
                      );
                  }
                  $('#id_examples').listview('refresh');
-
+                 $('#id_examples').on('click', 'li', function(){
+                     var index = $(this).index()
+                     var example = examples[index].example;
+                     ttsStop = false;
+                     fnSpeak(example);
+                 });
              });
 
              $('#id_play_all').click(function(){

@@ -107,6 +107,27 @@ function AddExample(jsonObjs, example){
     return resultJsonObj;
 }
 
+function DeleteExample(jsonObjs, reqOffset, index){
+    var rets = fnGetDayJson(jsonObjs, reqOffset, true);
+    var dayOffset = rets[0];
+    var jsonObj = rets[1]
+    if (dayOffset != reqOffset){
+        console.log('reqOffset', reqOffset, ' mismatch dayoffset', dayOffset)
+        return
+    }
+
+    if (index >= jsonObj.data.length){
+        console.log('index', index, ' exceeds array size', jsonObj.data.length)
+        return
+    }
+
+    console.log('deleting ', reqOffset, index
+                , 'example :', jsonObj.data[index].example)
+    jsonObj.data.splice(index, 1)
+    fs.writeFile(JSON_FILE_NAME, JSON.stringify(jsonObjs, null, 4));
+    return jsonObj
+}
+
 io2.sockets.on('connection', function(socket){
     var connId = socket.conn.id;
     console.log("connected " + connId);
@@ -133,5 +154,15 @@ io2.sockets.on('connection', function(socket){
         var retJsonObj = JSON.parse(JSON.stringify(jsonObj));
         retJsonObj.day_offset = 0;
         socket.emit('res_example', retJsonObj);
+    });
+    socket.on('delete_example', function(data){
+        var reqDayOffset = data.day_offset;
+        var index = data.index;
+        jsonObj = DeleteExample(jsonObjs, reqDayOffset, index);
+        if (jsonObj){
+            var retJsonObj = JSON.parse(JSON.stringify(jsonObj))
+            retJsonObj.day_offset = reqDayOffset;
+            socket.emit('res_example', retJsonObj);
+        }
     });
 });

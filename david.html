@@ -32,7 +32,17 @@
              responsiveVoice.speak(example, speaker, {onend:onNext});
          };
 
+         var fnPlay = function(e){
+             ttsStop = false;
+             fnSpeak(e);
+         };
+
          var socket = io.connect('http://' + location.host);
+
+         var fnDeleteExample = function(dayOffset, index){
+             socket.emit('delete_example'
+                       , {day_offset:dayOffset, index:index});
+         }
 
          var fnPlayNextSentence = function(e, currIdx){
              if (!(currIdx in e)){
@@ -75,14 +85,12 @@
                      var sentenceTag = $('<a href="#" style="white-space: normal;"/>').append(
                          sentence);
 
-                     var fnPlay = function(e){
-                         ttsStop = false;
-                         fnSpeak(e);
-                     };
 
                      sentenceTag.click(fnPlay.bind(this, example));
 
                      var deleteTag = $('<a href="#" data-icon="delete"/>');
+                     deleteTag.click(
+                         fnDeleteExample.bind(this, dayOffset, i));
 
                      $('#id_examples').append(
                          $('<li/>')

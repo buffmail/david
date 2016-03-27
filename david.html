@@ -75,7 +75,12 @@
                  window.dayOffset = jsonData.day_offset;
                  window.examples = jsonData.data;
 
-                 $('#id_date').text(jsonData.date);
+                 var d = new Date(jsonData.date);
+                 var dayStr = d.toLocaleString(
+                     window.navigator.language,
+                     {weekday: 'long'});
+                 var dateStr = jsonData.date + ' (' + dayStr + ')';
+                 $('#id_date').text(dateStr);
                  $('#id_examples').empty();
 
                  var len = examples.length;

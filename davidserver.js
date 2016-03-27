@@ -40,37 +40,42 @@ server.listen(PORT);
 
 var io2 = io.listen(server);
 
-function fnGetDay(date, dayOffset){
-    var d = new Date(date);
+function GetDateStr(date){
+    return date.getFullYear() + '-'
+        + leftpad(date.getMonth() + 1, 2, 0) + '-'
+        + leftpad(date.getDate(), 2, 0);
+}
+
+function GetTotalDays(dateStr, dayOffset){
+    var d = new Date(dateStr);
     d.setDate(d.getDate() + dayOffset);
     return Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
 }
 
 function fnGetDayJson(jsonObjs, dayOffset, prevSide){
-    var n = new Date()
-    var today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
-    var reqDays = fnGetDay(today, dayOffset);
-    var nowDays = fnGetDay(today, 0);
+    var todayStr = GetDateStr(new Date())
+    var reqDays = GetTotalDays(todayStr, dayOffset);
+    var nowDays = GetTotalDays(todayStr, 0);
 
     var len = jsonObjs.length
     for (var i = 0; i < len; i++)
     {
         var jsonObj = jsonObjs[i];
-        var days = fnGetDay(jsonObj.date, 0);
+        var days = GetTotalDays(jsonObj.date, 0);
         if (reqDays < days) {
             if (i == 0) {
                 return [days - nowDays, jsonObj];
             }
             var idx = prevSide ? i - 1 : i;
             jsonObj = jsonObjs[idx];
-            days = fnGetDay(jsonObj.date, 0);
-            return [days - nowDays, jsonObj];
-        }
-        if (i == jsonObjs.length - 1) {
+            days = GetTotalDays(jsonObj.date, 0);
             return [days - nowDays, jsonObj];
         }
         if (reqDays == days) {
             return [dayOffset, jsonObj];
+        }
+        if (i == jsonObjs.length - 1) {
+            return [days - nowDays, jsonObj];
         }
     }
 
@@ -78,17 +83,13 @@ function fnGetDayJson(jsonObjs, dayOffset, prevSide){
 }
 
 function AddExample(jsonObjs, example){
-    var n = new Date()
-    var nowDays = fnGetDay(
-        new Date(n.getFullYear(), n.getMonth(), n.getDate())
-        , 0);
-
+    var nowDays = GetTotalDays(GetDateStr(new Date()), 0);
     var resultJsonObj = null;
 
     var len = jsonObjs.length
     for (var i = 0; i < len; i++){
         var jsonObj = jsonObjs[i];
-        var days = fnGetDay(jsonObj.date, 0);
+        var days = GetTotalDays(jsonObj.date, 0);
 
         if (days == nowDays) {
             resultJsonObj = jsonObj;
@@ -97,10 +98,7 @@ function AddExample(jsonObjs, example){
     }
 
     if (!resultJsonObj){
-        var d = new Date();
-        var dateStr = d.getFullYear() + '-' +
-            leftpad(d.getMonth() + 1, 2, 0) + '-' +
-            leftpad(d.getDate(), 2, 0);
+        var dateStr = GetDateStr(new Date());
         resultJsonObj = {date:dateStr, data:[]};
         jsonObjs.push(resultJsonObj);
     }

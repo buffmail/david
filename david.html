@@ -69,7 +69,9 @@
          };
 
          $(document).ready(function(){
+
              socket.emit('req_example', {day_offset:0, delta:0});
+
              socket.on('res_example', function(jsonData){
                  window.ttsStop = false;
                  window.dayOffset = jsonData.day_offset;
@@ -125,13 +127,13 @@
              $('#id_btn_day_prev').click(function(){
                  $(this).removeClass('ui-btn-active')
                  socket.emit('req_example',
-                     {day_offset:dayOffset, delta:-1});
+                     {day_offset:window.dayOffset, delta:-1});
              });
 
              $('#id_btn_day_next').click(function(){
                  $(this).removeClass('ui-btn-active')
                  socket.emit('req_example',
-                     {day_offset:dayOffset, delta:1});
+                     {day_offset:window.dayOffset, delta:1});
              });
 
              $('#id_btn_send_new_example').click(function(){

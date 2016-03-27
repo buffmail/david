@@ -16,24 +16,25 @@
         <script src='/socket.io/socket.io.js'></script>
         <script>
 
-         var dayOffset = 0;
-         var examples = {};
-         var ttsStop = false;
-
-         var fnSpeak = function(example){
-             var speaker = "US English Male";
-             var onNext = function(){
-                setTimeout(fnSpeak.bind(this, example), 3000);
-             };
-             if (ttsStop){
-                ttsStop = false;
-                return;
-             }
-             responsiveVoice.speak(example, speaker, {onend:onNext});
-         };
+         window.dayOffset = 0;
+         window.examples = {};
+         window.ttsStop = false;
 
          var fnPlay = function(e){
-             ttsStop = false;
+             window.ttsStop = false;
+
+             var fnSpeak = function(example){
+                 var speaker = "US English Male";
+                 var onNext = function(){
+                     setTimeout(fnSpeak.bind(this, example), 3000);
+                 };
+                 if (window.ttsStop){
+                     window.ttsStop = false;
+                     return;
+                 }
+                 responsiveVoice.speak(example, speaker, {onend:onNext});
+             };
+
              fnSpeak(e);
          };
 
@@ -67,14 +68,15 @@
          $(document).ready(function(){
              socket.emit('req_example', {day_offset:0, delta:0});
              socket.on('res_example', function(jsonData){
-                 ttsStop = false;
-                 dayOffset = jsonData.day_offset;
-                 examples = jsonData.data;
+                 window.ttsStop = false;
+                 window.dayOffset = jsonData.day_offset;
+                 window.examples = jsonData.data;
 
                  $('#id_date').text(jsonData.date);
                  $('#id_examples').empty();
 
-                 for (var i in examples)
+                 var len = examples.length;
+                 for (var i=0; i<len; i++)
                  {
                      var example = examples[i].example;
                      var word = examples[i].word;
@@ -107,7 +109,7 @@
              });
 
              $('#id_play_stop').click(function(){
-                 ttsStop = true;
+                 window.ttsStop = true;
                  responsiveVoice.cancel();
                  $('#id_play_all').prop('value', 'Play ALL');
              });

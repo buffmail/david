@@ -51,7 +51,8 @@ function fnGetDayJson(jsonObjs, dayOffset, prevSide){
     var reqDays = fnGetDay(today, dayOffset);
     var nowDays = fnGetDay(today, 0);
 
-    for (var i in jsonObjs)
+    var len = jsonObjs.length
+    for (var i = 0; i < len; i++)
     {
         var jsonObj = jsonObjs[i];
         var days = fnGetDay(jsonObj.date, 0);
@@ -83,8 +84,8 @@ function AddExample(jsonObjs, example){
 
     var resultJsonObj = null;
 
-    for (var i in jsonObjs)
-    {
+    var len = jsonObjs.length
+    for (var i = 0; i < len; i++){
         var jsonObj = jsonObjs[i];
         var days = fnGetDay(jsonObj.date, 0);
 
@@ -112,12 +113,14 @@ function DeleteExample(jsonObjs, reqOffset, index){
     var dayOffset = rets[0];
     var jsonObj = rets[1]
     if (dayOffset != reqOffset){
-        console.log('reqOffset', reqOffset, ' mismatch dayoffset', dayOffset)
+        console.log('reqOffset', reqOffset, ' mismatch dayoffset'
+                    , dayOffset)
         return
     }
 
     if (index >= jsonObj.data.length){
-        console.log('index', index, ' exceeds array size', jsonObj.data.length)
+        console.log('index', index, ' exceeds array size'
+                    , jsonObj.data.length)
         return
     }
 

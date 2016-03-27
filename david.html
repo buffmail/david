@@ -78,9 +78,7 @@
                  window.examples = jsonData.data;
 
                  var d = new Date(jsonData.date);
-                 var dayStr = d.toLocaleString(
-                     window.navigator.language,
-                     {weekday: 'long'});
+                 var dayStr = '일월화수목금토'[d.getDay()];
                  var dateStr = jsonData.date + ' (' + dayStr + ')';
                  $('#id_date').text(dateStr);
                  $('#id_examples').empty();

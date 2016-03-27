@@ -2,6 +2,7 @@ var http = require('http');
 var fs = require('fs');
 var url = require('url');
 var io = require('socket.io');
+var leftpad = require('left-pad');
 
 const PORT=8080;
 const mainHtmlPath = __dirname + "/david.html";
@@ -98,8 +99,8 @@ function AddExample(jsonObjs, example){
     if (!resultJsonObj){
         var d = new Date();
         var dateStr = d.getFullYear() + '-' +
-            (d.getMonth() + 1) + '-' +
-            d.getDate();
+            leftpad(d.getMonth() + 1, 2, 0) + '-' +
+            leftpad(d.getDate(), 2, 0);
         resultJsonObj = {date:dateStr, data:[]};
         jsonObjs.push(resultJsonObj);
     }

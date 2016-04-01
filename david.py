@@ -31,8 +31,9 @@ def adjustWinPos():
     win32gui.EnumWindows(callback, 'Chrome_WidgetWin_1')
 
     if adjustWinPos.chromeWin:
+        screenInfo = win32api.GetMonitorInfo(1)
+        height = screenInfo['Work'][3]
         halfWidth = win32api.GetSystemMetrics(0) / 2
-        height = win32api.GetSystemMetrics(1)
         cursorX, _ = win32api.GetCursorPos()
         leftSide = (cursorX > halfWidth)
         xPos = 0 if leftSide else halfWidth

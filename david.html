@@ -21,25 +21,35 @@
 
          window.dayOffset = 0;
          window.examples = {};
-         window.ttsStop = false;
+         window.nextSpeak = null;
 
-         var fnPlay = function(e){
-             window.ttsStop = false;
+         var fnPlay = function(i, n){
 
-             var fnSpeak = function(example){
+             if (window.nextSpeak){
+                 clearTimeout(window.nextSpeak);
+                 window.nextSpeak = null;
+             }
+
+             var fnDelayPlay = function(index, next){
                  var speaker = "US English Male";
-                 var timeout = $('#id_slide').val() * 1000;
-                 var onNext = function(){
-                     setTimeout(fnSpeak.bind(this, example), timeout);
-                 };
-                 if (window.ttsStop){
-                     window.ttsStop = false;
+                 var timeoutVal = $('#id_slide').val() * 1000;
+                 if (!(index in window.examples)){
                      return;
                  }
+                 var example = window.examples[index].example;
+                 var onNext = function(){
+                     var nextIndex = next ? index + 1 : index;
+                     if (!(nextIndex in window.examples)){
+                         nextIndex = 0;
+                     }
+                     window.nextSpeak = setTimeout(
+                         fnDelayPlay.bind(this, nextIndex, next),
+                         timeoutVal);
+                 };
                  responsiveVoice.speak(example, speaker, {onend:onNext});
              };
 
-             fnSpeak(e);
+             fnDelayPlay(i, n);
          };
 
          var socket = io.connect('http://' + location.host);
@@ -49,32 +59,12 @@
                        , {day_offset:dayOffset, index:index});
          }
 
-         var fnPlayNextSentence = function(e, currIdx){
-             if (!(currIdx in e)){
-                 if (currIdx == 0){
-                    console.log("Empty examples?");
-                    return;
-                 }
-
-                 currIdx = 0;
-             }
-
-             var sentence = e[currIdx].example;
-             var word = e[currIdx].word;
-             var speaker = "US English Male";
-             var fnNextPlay = fnPlayNextSentence.bind(this,
-                                                      e, currIdx+1);
-             responsiveVoice.speak(sentence, speaker,
-                                   {onend:fnNextPlay});
-             $('#id_play_all').prop('value', 'Playing ' + word);
-         };
-
          $(document).ready(function(){
 
              socket.emit('req_example', {day_offset:0, delta:0});
 
              socket.on('res_example', function(jsonData){
-                 window.ttsStop = false;
+
                  window.dayOffset = jsonData.day_offset;
                  window.examples = jsonData.data;
 
@@ -97,7 +87,7 @@
                          sentence);
 
 
-                     sentenceTag.click(fnPlay.bind(this, example));
+                     sentenceTag.click(fnPlay.bind(this, i, false));
 
                      var deleteTag = $('<a href="#" data-icon="delete"/>');
                      deleteTag.click(
@@ -114,13 +104,15 @@
              });
 
              $('#id_play_all').click(function(){
-                 fnPlayNextSentence(examples, 0);
+                 fnPlay(0, true);
              });
 
              $('#id_play_stop').click(function(){
-                 window.ttsStop = true;
+                 if (window.nextSpeak){
+                     clearTimeout(window.nextSpeak);
+                     window.nextSpeak = null;
+                 }
                  responsiveVoice.cancel();
-                 $('#id_play_all').prop('value', 'Play ALL');
              });
 
              $('#id_btn_day_prev').click(function(){

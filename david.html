@@ -142,6 +142,12 @@
                  socket.emit('add_example', {example:example});
                  inputElem.val('');
              });
+
+             $('#id_new_example').keyup(function(event){
+                 if (event.keyCode == 13) {
+                     $('#id_btn_send_new_example').click();
+                 }
+             });
          });
 
         </script>

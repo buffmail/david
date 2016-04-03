@@ -1,0 +1,24 @@
+{
+  "name": "david_web",
+  "description": "david web server",
+  "main": "index.js",
+  "authors": [
+    "Chang Jaehwa <buffmail@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/buffmail/david",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.2",
+    "js-cookie": "^2.1.0"
+  }
+}

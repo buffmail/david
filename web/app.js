@@ -1,7 +1,9 @@
-var http = require('http');
+var express = require('express')
+var app = express()
+var server = require('http').createServer(app)
+var io = require('socket.io')(server);
 var fs = require('fs');
 var url = require('url');
-var io = require('socket.io');
 var leftpad = require('left-pad');
 
 const PORT=8080;
@@ -10,32 +12,11 @@ const JSON_FILE_NAME = 'data.json';
 
 var jsonObjs = JSON.parse(fs.readFileSync(JSON_FILE_NAME, 'utf8'));
 
-var server = http.createServer(function(request, response){
-    var path = url.parse(request.url).pathname;
-    console.log('GET ' + path);
-
-    switch(path){
-    case '/':
-    case '/david.html':
-        var fullpath = mainHtmlPath;
-        fs.readFile(fullpath, function(err, data){
-            if (err) {
-                response.writeHead(404);
-                response.write("oops file does not exist - 404");
-            } else {
-                response.writeHead(200, {"Content-Type" : "text/html"});
-                response.write(data, "utf8");
-            }
-            response.end();
-        });
-        break;
-
-    default:
-        response.writeHead(404);
-        response.write("oops 404");
-        response.end();
-    }
+app.use(express.static(__dirname + '/bower_components'));
+app.get('/', function(req, res, next) {
+    res.sendFile(__dirname + '/david.html');
 });
+
 server.listen(PORT);
 
 var io2 = io.listen(server);
@@ -168,3 +149,4 @@ io2.sockets.on('connection', function(socket){
         }
     });
 });
+

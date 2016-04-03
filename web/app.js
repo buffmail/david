@@ -1,7 +1,6 @@
 var express = require('express')
 var app = express()
-var server = require('http').createServer(app)
-var io = require('socket.io')(server);
+var io = require('socket.io');
 var fs = require('fs');
 var url = require('url');
 var leftpad = require('left-pad');
@@ -17,9 +16,7 @@ app.get('/', function(req, res, next) {
     res.sendFile(__dirname + '/david.html');
 });
 
-server.listen(PORT);
-
-var io2 = io.listen(server);
+var io2 = io.listen(app.listen(PORT));
 
 function GetDateStr(date){
     return date.getFullYear() + '-'

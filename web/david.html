@@ -89,7 +89,7 @@
                          sentence);
 
                      var play = function(idx){
-                         $('#id_page_dialog').popup('open');
+                         $('#id_page_dialog_speak').popup('open');
                          fnPlay(idx, false);
                      };
 
@@ -109,19 +109,24 @@
                  $('#id_examples').listview('refresh');
              });
 
-             $('#id_play_all').click(function(){
-                 $('#id_page_dialog').popup('open');
+             $('#id_btn_play_all').click(function(){
+                 $('#id_page_dialog_speak').popup('open');
                  fnPlay(0, true);
              });
 
              $('#id_btn_day_prev').click(function(){
-                 $(this).removeClass('ui-btn-active')
+                 $(this).removeClass('ui-btn-active');
                  socket.emit('req_example',
                      {day_offset:window.dayOffset, delta:-1});
              });
 
+             $('#id_btn_dialog_add').click(function(){
+                 $(this).removeClass('ui-btn-active');
+                 $('#id_page_dialog_add').popup('open');
+             });
+
              $('#id_btn_day_next').click(function(){
-                 $(this).removeClass('ui-btn-active')
+                 $(this).removeClass('ui-btn-active');
                  socket.emit('req_example',
                      {day_offset:window.dayOffset, delta:1});
              });
@@ -141,7 +146,7 @@
                  }
              });
 
-             $('#id_page_dialog').bind({
+             $('#id_page_dialog_speak').bind({
                  popupafterclose: function(event, ui){
                      if (window.nextSpeak){
                          clearTimeout(window.nextSpeak);
@@ -167,6 +172,10 @@
                                data-icon="arrow-l" ></a>
                         </li>
                         <li>
+                            <a href="#" id="id_btn_dialog_add"
+                               data-icon="plus" ></a>
+                        </li>
+                        <li>
                             <a href="#" id="id_btn_day_next"
                                data-icon="arrow-r" ></a>
                         </li>
@@ -174,19 +183,19 @@
                 </div>
             </div>
 
+            <div style="text-align: center;">
+                <a href="#" data-role="button" data-inline="true"
+                   data-theme="c" data-mini="true"
+                   data-icon="audio" id="id_btn_play_all" >
+                    Play ALL
+                </a>
+            </div>
+
+
             <ul id="id_examples" data-role="listview" data-theme="g">
             </ul>
 
-            <p>
-                <input id='id_play_all' type='button' value='Play ALL'/>
-            </p>
-
-            <p>
-                <input id='id_new_example' type='text' size="30"/>
-                <input id='id_btn_send_new_example' type='button' value="send"/>
-            </p>
-
-            <div data-role="popup" id="id_page_dialog"
+            <div data-role="popup" id="id_page_dialog_speak"
                  data-overlay-theme="a" data-theme="a"
                  style="min-width:300px; max-width:300px;"
                  class="ui-corner-all">
@@ -221,14 +230,47 @@
 
                     <div style="text-align: center;">
                         <a href="#" data-role="button" data-inline="true"
-                       data-rel="back" data-theme="b" data-mini="true"
-                       data-icon="back">
-                        Stop
+                           data-rel="back" data-theme="b" data-mini="true"
+                           data-icon="back">
+                        Back
                         </a>
-                    </div>
+                    </div> <!-- btn -->
+                </div> <!-- content -->
+            </div> <!-- popup -->
+
+            <div data-role="popup" id="id_page_dialog_add"
+                 data-overlay-theme="a" data-theme="a"
+                 style="min-width:300px; max-width:300px;"
+                 class="ui-corner-all">
+
+                <div data-role="header" data-theme="a"
+                     class="ui-corner-top">
+                    <h1> Add Example </h1>
                 </div>
 
-            </div>
+                <div data-role="content" data-theme="d"
+                     class="ui-corner-bottom ui-content">
+
+                    <div>
+                        <input id='id_new_example'
+                               type='text' data-mini="true" size="30" />
+                    </div>
+
+                    <div style="text-align: right;">
+                        <a href="#" id="id_btn_send_new_example"
+                           data-role="button" data-inline="true"
+                           data-theme="b"
+                           data-mini="true" data-icon="plus">
+                            Add
+                        </a>
+                        <a href="#" data-role="button" data-inline="true"
+                           data-rel="back" data-theme="b"
+                           data-mini="true" data-icon="back">
+                            Back
+                        </a>
+                    </div> <!-- btn -->
+                </div> <!-- content -->
+            </div> <!-- popup -->
 
         </div>
 

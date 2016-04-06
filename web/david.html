@@ -47,6 +47,7 @@
                          fnDelayPlay.bind(this, nextIndex, next),
                          timeoutVal);
                  };
+                 $('#id_popup_sentence').text(example);
                  responsiveVoice.speak(example, speaker, {onend:onNext});
              };
 
@@ -87,8 +88,12 @@
                      var sentenceTag = $('<a href="#" style="white-space: normal;"/>').append(
                          sentence);
 
+                     var play = function(idx){
+                         $('#id_page_dialog').popup('open');
+                         fnPlay(idx, false);
+                     };
 
-                     sentenceTag.click(fnPlay.bind(this, i, false));
+                     sentenceTag.click(play.bind(this, i));
 
                      var deleteTag = $('<a href="#" data-icon="delete"/>');
                      deleteTag.click(
@@ -105,15 +110,8 @@
              });
 
              $('#id_play_all').click(function(){
+                 $('#id_page_dialog').popup('open');
                  fnPlay(0, true);
-             });
-
-             $('#id_play_stop').click(function(){
-                 if (window.nextSpeak){
-                     clearTimeout(window.nextSpeak);
-                     window.nextSpeak = null;
-                 }
-                 responsiveVoice.cancel();
              });
 
              $('#id_btn_day_prev').click(function(){
@@ -142,6 +140,16 @@
                      $('#id_btn_send_new_example').click();
                  }
              });
+
+             $('#id_page_dialog').bind({
+                 popupafterclose: function(event, ui){
+                     if (window.nextSpeak){
+                         clearTimeout(window.nextSpeak);
+                         window.nextSpeak = null;
+                     }
+                     responsiveVoice.cancel();
+                 }
+             });
          });
 
         </script>
@@ -149,7 +157,7 @@
     </head>
 
     <body>
-        <div data-role="page" id="id_page">
+        <div data-role="page" id="id_page_main">
             <div data-role="header">
                 <h1 id="id_date"> date </h1>
                 <div data-role="navbar" >
@@ -171,26 +179,59 @@
 
             <p>
                 <input id='id_play_all' type='button' value='Play ALL'/>
-                <input id='id_play_stop' type='button' value='stop current play'/>
-            </p>
-            <p>
-                <input id="id_slide" type ="range"
-                       min ="0" max="3" step ="0.1" value ="1"/>
-            </p>
-            <p>
-                <select id="id_voices" name="voices">
-                    <option value="US English Male"> US Male </option>
-                    <option value="US English Female"> US Female </option>
-                    <option value="UK English Male"> UK Male </option>
-                    <option value="UK English Female"> UK Female </option>
-                </select>
             </p>
 
             <p>
                 <input id='id_new_example' type='text' size="30"/>
                 <input id='id_btn_send_new_example' type='button' value="send"/>
             </p>
+
+            <div data-role="popup" id="id_page_dialog"
+                 data-overlay-theme="a" data-theme="a"
+                 style="min-width:300px; max-width:300px;"
+                 class="ui-corner-all">
+
+                <div data-role="header" data-theme="a"
+                     class="ui-corner-top">
+                    <h1> Playing </h1>
+                </div>
+
+                <div data-role="content" data-theme="d"
+                     class="ui-corner-bottom ui-content">
+
+                    <h3 id="id_popup_sentence">speaking sentences.</h3>
+
+                    <hr>
+
+                    <div>
+                        <input id="id_slide" type ="range"
+                               min ="0" max="3" step ="0.1" value ="1"/>
+
+                        <select id="id_voices" name="voices">
+                            <option value="US English Male"> US Male
+                            </option>
+                            <option value="US English Female"> US Female
+                            </option>
+                            <option value="UK English Male"> UK Male
+                            </option>
+                            <option value="UK English Female"> UK Female
+                            </option>
+                        </select>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <a href="#" data-role="button" data-inline="true"
+                       data-rel="back" data-theme="b" data-mini="true"
+                       data-icon="back">
+                        Stop
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
+
     </body>
 
 </html>

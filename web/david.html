@@ -38,6 +38,7 @@
                      return;
                  }
                  var example = window.examples[index].example;
+                 var sentence = (index + 1).toString() + '. ' + example;
                  var onNext = function(){
                      var nextIndex = next ? index + 1 : index;
                      if (!(nextIndex in window.examples)){
@@ -47,7 +48,7 @@
                          fnDelayPlay.bind(this, nextIndex, next),
                          timeoutVal);
                  };
-                 $('#id_popup_sentence').text(example);
+                 $('#id_popup_sentence').text(sentence);
                  responsiveVoice.speak(example, speaker, {onend:onNext});
              };
 
@@ -72,7 +73,10 @@
 
                  var d = new Date(jsonData.date);
                  var dayStr = '일월화수목금토'[d.getDay()];
-                 var dateStr = jsonData.date + ' (' + dayStr + ')';
+                 var numStr = window.examples.length.toString();
+                 var dateStr = jsonData.date + ' ('
+                             + dayStr + ','
+                             + numStr + ')';
                  $('#id_date').text(dateStr);
                  $('#id_examples').empty();
 
@@ -84,6 +88,7 @@
                      var sentence = example.replace(
                          word,
                          $('<strong/>').text(word).prop('outerHTML'));
+                     sentence = (i+1).toString() + '. ' + sentence;
 
                      var sentenceTag = $('<a href="#" style="white-space: normal;"/>').append(
                          sentence);
@@ -123,6 +128,7 @@
              $('#id_btn_dialog_add').click(function(){
                  $(this).removeClass('ui-btn-active');
                  $('#id_page_dialog_add').popup('open');
+                 $('#id_new_example').focus();
              });
 
              $('#id_btn_day_next').click(function(){
@@ -138,6 +144,7 @@
                      return;
                  socket.emit('add_example', {example:example});
                  inputElem.val('');
+                 $('#id_page_dialog_add').popup('close');
              });
 
              $('#id_new_example').keyup(function(event){

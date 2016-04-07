@@ -38,7 +38,6 @@
                      return;
                  }
                  var example = window.examples[index].example;
-                 var sentence = (index + 1).toString() + '. ' + example;
                  var onNext = function(){
                      var nextIndex = next ? index + 1 : index;
                      if (!(nextIndex in window.examples)){
@@ -48,7 +47,12 @@
                          fnDelayPlay.bind(this, nextIndex, next),
                          timeoutVal);
                  };
-                 $('#id_popup_sentence').text(sentence);
+                 var titleSentence = 'Playing (' + (index+1).toString() +
+                                     '/' +
+                                     window.examples.length.toString() +
+                                     ')';
+                 $('#id_title_speak').text(titleSentence);
+                 $('#id_popup_sentence').text(example);
                  responsiveVoice.speak(example, speaker, {onend:onNext});
              };
 
@@ -209,7 +213,7 @@
 
                 <div data-role="header" data-theme="a"
                      class="ui-corner-top">
-                    <h1> Playing </h1>
+                    <h1 id="id_title_speak"> Playing </h1>
                 </div>
 
                 <div data-role="content" data-theme="d"

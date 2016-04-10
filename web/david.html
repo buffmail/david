@@ -31,20 +31,31 @@
                  window.nextSpeak = null;
              }
 
-             var fnDelayPlay = function(index, next){
+             var fnDelayPlay = function(index, repeatCount, next){
                  var speaker = $('#id_voices').val();
-                 var timeoutVal = $('#id_slide').val() * 1000;
+                 var timeoutVal = $('#id_slide_delay').val() * 1000;
                  if (!(index in window.examples)){
                      return;
                  }
                  var example = window.examples[index].example;
                  var onNext = function(){
-                     var nextIndex = next ? index + 1 : index;
+                     var nextIndex = index;
+                     var nextRepeatCount = repeatCount + 1;
+                     if (next) {
+                         var repeatVal = $('#id_slide_repeat').val();
+                         if (repeatCount >= repeatVal){
+                             nextIndex = index + 1;
+                             nextRepeatCount = 1;
+                         }
+                     }
                      if (!(nextIndex in window.examples)){
                          nextIndex = 0;
                      }
                      window.nextSpeak = setTimeout(
-                         fnDelayPlay.bind(this, nextIndex, next),
+                         fnDelayPlay.bind(this
+                                        , nextIndex
+                                        , nextRepeatCount
+                                        , next),
                          timeoutVal);
                  };
                  var titleSentence = 'Playing (' + (index+1).toString() +
@@ -56,7 +67,7 @@
                  responsiveVoice.speak(example, speaker, {onend:onNext});
              };
 
-             fnDelayPlay(i, n);
+             fnDelayPlay(i, 1, n);
          };
 
          var socket = io.connect('http://' + location.host);
@@ -133,6 +144,7 @@
                  $(this).removeClass('ui-btn-active');
                  $('#id_page_dialog_add').popup('open');
                  $('#id_new_example').focus();
+                 $('#id_new_example').val('');
              });
 
              $('#id_btn_day_next').click(function(){
@@ -224,8 +236,13 @@
                     <hr>
 
                     <div>
-                        <input id="id_slide" type ="range"
+                        <lable>delay:</lable>
+                        <input id="id_slide_delay" type ="range"
                                min ="0" max="3" step ="0.1" value ="1"/>
+
+                        <lable>repeat:</lable>
+                        <input id="id_slide_repeat" type ="range"
+                               min ="0" max="3" step ="1" value ="1"/>
 
                         <select id="id_voices" name="voices">
                             <option value="US English Male"> US Male

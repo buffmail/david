@@ -178,7 +178,20 @@
                      responsiveVoice.cancel();
                  }
              });
-         });
+
+             $(window).keypress(function(e) {
+                 var popupElem = $('#id_page_dialog_add');
+                 if (popupElem.parent().hasClass("ui-popup-active")){
+                     return;
+                 }
+                 var ev = e || window.event;
+                 var key = ev.keyCode || ev.which;
+                 if (key == 105){
+                     $('#id_btn_dialog_add').click();
+                     return false;
+                 }
+             });
+         }); // ready()
 
         </script>
         <title>english examples</title>

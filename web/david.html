@@ -87,9 +87,19 @@
                  window.examples = jsonData.data;
 
                  var d = new Date(jsonData.date);
-                 var onejan = new Date(d.getFullYear(), 0, 1);
-                 var weekNum = Math.ceil(
-                     (((d - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+
+                 var fnGetIdxOfWeek = function(date){
+                     var oneJan = new Date(date.getFullYear(), 0, 1);
+                     var daysFromOneJan = Math.floor(
+                         (date - oneJan) / (60*60*24*1000));
+                     var startDayOffset = 7 - oneJan.getDay();
+                     var idx = Math.floor(
+                         (daysFromOneJan - date.getDay() - startDayOffset)
+                             / 7);
+                     return idx;
+                 }
+
+                 var weekNum = fnGetIdxOfWeek(d) + 1;
                  var dayStr = '일월화수목금토'[d.getDay()];
                  var numStr = window.examples.length.toString();
                  var dateStr = jsonData.date + ' (w'

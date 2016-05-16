@@ -6,14 +6,15 @@ var url = require('url');
 var leftpad = require('left-pad');
 
 const PORT=8080;
-const mainHtmlPath = __dirname + "/david.html";
+const mainHtmlPath = __dirname + "/public/david.html";
 const JSON_FILE_NAME = 'data.json';
 
 var jsonObjs = JSON.parse(fs.readFileSync(JSON_FILE_NAME, 'utf8'));
 
 app.use(express.static(__dirname + '/bower_components'));
+app.use(express.static(__dirname + '/public'));
 app.get('/', function(req, res, next) {
-    res.sendFile(__dirname + '/david.html');
+    res.sendFile(mainHtmlPath);
 });
 
 var io2 = io.listen(app.listen(PORT));

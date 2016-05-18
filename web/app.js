@@ -6,7 +6,6 @@ var url = require('url');
 var leftpad = require('left-pad');
 
 const PORT=8080;
-const mainHtmlPath = __dirname + "/public/david.html";
 const JSON_FILE_NAME = 'data.json';
 
 var jsonObjs = JSON.parse(fs.readFileSync(JSON_FILE_NAME, 'utf8'));
@@ -15,8 +14,8 @@ app.use(express.static(__dirname + '/bower_components'));
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'pug')
 app.set('views', __dirname + '/views');
-app.get('/', function(req, res, next) {
-    res.sendFile(mainHtmlPath);
+app.get('/', function(req, res) {
+    res.render('index');
 });
 
 app.use(function(req, res, next){

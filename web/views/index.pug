@@ -1,0 +1,92 @@
+doctype html
+html(lang="en")
+  head
+    meta(http-equiv="Content-Type"
+      content="text/html; charset=utf-8")
+    meta(name="viewport"
+      content="width=device-width, initial-scale=1.0")
+    script(src='https://code.responsivevoice.org/responsivevoice.js')
+    script(src='http://code.jquery.com/jquery-1.11.3.min.js')
+    script(src="http://code.jquery.com/mobile/1.4.5"
+      +"/jquery.mobile-1.4.5.min.js")
+    script(src='/socket.io/socket.io.js')
+    script(src='/js-cookie/src/js.cookie.js')
+    script(src='/js/david-client.js')
+    link(rel='stylesheet'
+      href="http://code.jquery.com/mobile/1.4.5"
+        +"/jquery.mobile-1.4.5.min.css")
+    title english example
+  body
+    div(data-role="page" id="id_page_main")
+      div(data-role="header")
+        h3(id="id_date" style="margin: 0; width: 100%;") date
+        div(data-role="navbar")
+          ul
+            li: a(href="#" id="id_btn_day_prev" data-icon="arrow-l")
+            li: a(href="#" id="id_btn_dialog_add" data-icon="plus")
+            li: a(href="#" id="id_btn_day_next" data-icon="arrow-r")
+      div(style="text-align: center;")
+        a(href="#" data-role="button" data-inline="true"
+          data-theme="c" data-mini="true" data-icon="audio"
+          id="id_btn_play_all") Play ALL
+
+      ul(id="id_examples" data-role="listview" data-theme="g")
+
+      div(data-role="popup" id="id_page_dialog_speak"
+        data-overlay-theme="a" data-theme="a"
+        style="min-width: 300px; max-width: 300px;"
+        class="ui_corner-all")
+
+        div(data-role="header" data-theme="a"
+          class="ui-corner-top")
+          h1(id="id_title_speak") Playing
+
+        div(data-role="content" data-theme="d"
+          class="ui-corner-bottom ui-content")
+
+          h3(id="id_popup_sentence") speaking sentences.
+
+          hr
+
+          div
+            label delay:
+            input(id="id_slide_delay" type="range" min="0" max="3"
+              step="0.1" value="1")
+
+            label repeat:
+            input(id="id_slide_report" type="range" min="0" max="10"
+              step="1" value="3")
+
+            select(id="id_voices" name="voices")
+              option(value="US English Male") US Male
+              option(value="US English Female") US Female
+              option(value="UK English Male") UK Male
+              option(value="UK English Female") UK Female
+
+          div(style="text-align: center;")
+            a(href="#" data-role="button" data-inline="true"
+              data-rel="back" data-theme="b" data-mini="true"
+              data-icon="back") Back
+
+      div(data-role="popup" id="id_page_dialog_add"
+        data-overlay-theme="a" data-theme="a"
+        style="min-width: 300px; max-width: 300px;"
+        class="ui-corner-all")
+
+        div(data-role="header" data-theme="a" class="ui-corner-top")
+          h1 Add Example
+
+        div(data-role="content" data-theme="a"
+          class="ui-corner-bottom ui-content")
+
+          div
+            input(id="id_new_example" type="text" data-mini="true"
+              size="30")
+          
+          div(style="text-align: right;")
+            a(href="#" id="id_btn_send_new_example"
+              data-role="button" data-inline="true" data-theme="b"
+              data-mini="true" data-icon="plus") Add
+            a(href="#" data-role="button" data-inline="true"
+              data-rel="back" data-theme="b" data-mini="true"
+              data-icon="back") Back

@@ -13,8 +13,14 @@ var jsonObjs = JSON.parse(fs.readFileSync(JSON_FILE_NAME, 'utf8'));
 
 app.use(express.static(__dirname + '/bower_components'));
 app.use(express.static(__dirname + '/public'));
+app.set('view engine', 'pug')
+app.set('views', __dirname + '/views');
 app.get('/', function(req, res, next) {
     res.sendFile(mainHtmlPath);
+});
+
+app.use(function(req, res, next){
+    res.status(404).render('404', {url: req.originalUrl});
 });
 
 var io2 = io.listen(app.listen(PORT));

@@ -1,3 +1,4 @@
+"use strict";
 
 window.dayOffset = 0;
 window.examples = {};

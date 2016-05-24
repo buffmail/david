@@ -132,6 +132,7 @@ io2.sockets.on('connection', function(socket){
         }
         var retJsonObj = JSON.parse(JSON.stringify(jsonObj));
         retJsonObj.day_offset = dayOffset;
+        retJsonObj.daily_base = data.daily_base;
         socket.emit('res_example', retJsonObj);
     });
     socket.on('add_example', function(data){
@@ -139,6 +140,7 @@ io2.sockets.on('connection', function(socket){
         var jsonObj = AddExample(jsonObjs, example);
         var retJsonObj = JSON.parse(JSON.stringify(jsonObj));
         retJsonObj.day_offset = 0;
+        retJsonObj.daily_base = data.daily_base;
         socket.emit('res_example', retJsonObj);
     });
     socket.on('delete_example', function(data){
@@ -148,6 +150,7 @@ io2.sockets.on('connection', function(socket){
         if (jsonObj){
             var retJsonObj = JSON.parse(JSON.stringify(jsonObj))
             retJsonObj.day_offset = reqDayOffset;
+            retJsonObj.daily_base = data.daily_base;
             socket.emit('res_example', retJsonObj);
         }
     });

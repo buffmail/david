@@ -3,6 +3,7 @@
 window.dayOffset = 0;
 window.examples = {};
 window.nextSpeak = null;
+window.dailyBase = true;
 
 var fnPlay = function(i, n){
 
@@ -56,6 +57,7 @@ var fnOnResExample = function(jsonData){
 
     window.dayOffset = jsonData.day_offset;
     window.examples = jsonData.data;
+    window.dailyBase = jsonData.daily_base
 
     var d = new Date(jsonData.date);
 
@@ -103,7 +105,9 @@ var fnOnResExample = function(jsonData){
 
         var fnDeleteExample = function(dayOffset, index){
             socket.emit('delete_example'
-                , {day_offset:dayOffset, index:index});
+                        , {day_offset:dayOffset
+                           , index:index
+                           , daily_base:window.dailyBase});
         };
 
         var deleteTag = $('<a href="#" data-icon="delete"/>');
@@ -122,7 +126,10 @@ var fnOnResExample = function(jsonData){
 
 $(document).ready(function(){
 
-    socket.emit('req_example', {day_offset:0, delta:0});
+    socket.emit('req_example'
+                ,{day_offset:0
+                  , delta:0
+                  , daily_base:window.dailyBase});
 
     socket.on('res_example', fnOnResExample);
 
@@ -133,8 +140,10 @@ $(document).ready(function(){
 
     $('#id_btn_day_prev').click(function(){
         $(this).removeClass('ui-btn-active');
-        socket.emit('req_example',
-                    {day_offset:window.dayOffset, delta:-1});
+        socket.emit('req_example'
+                    , {day_offset:window.dayOffset
+                       , delta:-1
+                       , daily_base:window.dailyBase});
     });
 
     $('#id_btn_dialog_add').click(function(){
@@ -147,7 +156,9 @@ $(document).ready(function(){
     $('#id_btn_day_next').click(function(){
         $(this).removeClass('ui-btn-active');
         socket.emit('req_example',
-                    {day_offset:window.dayOffset, delta:1});
+                    {day_offset:window.dayOffset
+                     , delta:1
+                     , daily_base:window.dailyBase});
     });
 
     $('#id_btn_send_new_example').click(function(){
@@ -155,7 +166,9 @@ $(document).ready(function(){
         var example = inputElem.val();
         if (example.length == 0)
             return;
-        socket.emit('add_example', {example:example});
+        socket.emit('add_example'
+                    ,{example:example
+                      , daily_base:window.dailyBase});
         inputElem.val('');
         $('#id_page_dialog_add').popup('close');
     });
@@ -174,6 +187,11 @@ $(document).ready(function(){
             }
             responsiveVoice.cancel();
         }
+    });
+
+    $('#id_btn_toggle_daily_base').click(function(){
+        window.dailyBase = !window.dailyBase;
+        $(this).text(window.dailyBase ? "Daily" : "Weekly");
     });
 
     $(window).keypress(function(e) {

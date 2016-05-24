@@ -52,76 +52,79 @@ var fnPlay = function(i, n){
 
 var socket = io.connect('http://' + location.host);
 
-var fnDeleteExample = function(dayOffset, index){
-    socket.emit('delete_example'
+var fnOnResExample = function(jsonData){
+
+    window.dayOffset = jsonData.day_offset;
+    window.examples = jsonData.data;
+
+    var d = new Date(jsonData.date);
+
+    var fnGetIdxOfWeek = function(date){
+        var oneJan = new Date(date.getFullYear(), 0, 1);
+        var daysFromOneJan = Math.floor(
+            (date - oneJan) / (60*60*24*1000));
+        var startDayOffset = 7 - oneJan.getDay();
+        var idx = Math.floor(
+            (daysFromOneJan - date.getDay() - startDayOffset)
+                / 7);
+        return idx;
+    }
+
+    var weekNum = fnGetIdxOfWeek(d) + 1;
+    var dayStr = '일월화수목금토'[d.getDay()];
+    var numStr = window.examples.length.toString();
+    var dateStr = jsonData.date + ' (w'
+        + weekNum + ','
+        + dayStr + ','
+        + numStr + ')';
+    $('#id_date').text(dateStr);
+    $('#id_examples').empty();
+
+    var len = examples.length;
+    for (var i=0; i<len; i++)
+    {
+        var example = examples[i].example;
+        var word = examples[i].word;
+        var sentence = example.replace(
+            word,
+            $('<strong/>').text(word).prop('outerHTML'));
+        sentence = (i+1).toString() + '. ' + sentence;
+
+        var sentenceTag =
+            $('<a href="#" style="white-space: normal;"/>')
+            .append(sentence);
+
+        var play = function(idx){
+            $('#id_page_dialog_speak').popup('open');
+            fnPlay(idx, false);
+        };
+
+        sentenceTag.click(play.bind(this, i));
+
+        var fnDeleteExample = function(dayOffset, index){
+            socket.emit('delete_example'
                 , {day_offset:dayOffset, index:index});
+        };
+
+        var deleteTag = $('<a href="#" data-icon="delete"/>');
+        deleteTag.click(
+            fnDeleteExample.bind(this, dayOffset, i));
+
+        $('#id_examples').append(
+            $('<li/>')
+                .append(sentenceTag)
+                .append(deleteTag)
+        );
+    }
+
+    $('#id_examples').listview('refresh');
 }
 
 $(document).ready(function(){
 
     socket.emit('req_example', {day_offset:0, delta:0});
 
-    socket.on('res_example', function(jsonData){
-
-        window.dayOffset = jsonData.day_offset;
-        window.examples = jsonData.data;
-
-        var d = new Date(jsonData.date);
-
-        var fnGetIdxOfWeek = function(date){
-            var oneJan = new Date(date.getFullYear(), 0, 1);
-            var daysFromOneJan = Math.floor(
-                (date - oneJan) / (60*60*24*1000));
-            var startDayOffset = 7 - oneJan.getDay();
-            var idx = Math.floor(
-                (daysFromOneJan - date.getDay() - startDayOffset)
-                    / 7);
-            return idx;
-        }
-
-        var weekNum = fnGetIdxOfWeek(d) + 1;
-        var dayStr = '일월화수목금토'[d.getDay()];
-        var numStr = window.examples.length.toString();
-        var dateStr = jsonData.date + ' (w'
-            + weekNum + ','
-            + dayStr + ','
-            + numStr + ')';
-        $('#id_date').text(dateStr);
-        $('#id_examples').empty();
-
-        var len = examples.length;
-        for (var i=0; i<len; i++)
-        {
-            var example = examples[i].example;
-            var word = examples[i].word;
-            var sentence = example.replace(
-                word,
-                $('<strong/>').text(word).prop('outerHTML'));
-            sentence = (i+1).toString() + '. ' + sentence;
-
-            var sentenceTag = $('<a href="#" style="white-space: normal;"/>').append(
-                sentence);
-
-            var play = function(idx){
-                $('#id_page_dialog_speak').popup('open');
-                fnPlay(idx, false);
-            };
-
-            sentenceTag.click(play.bind(this, i));
-
-            var deleteTag = $('<a href="#" data-icon="delete"/>');
-            deleteTag.click(
-                fnDeleteExample.bind(this, dayOffset, i));
-
-            $('#id_examples').append(
-                $('<li/>')
-                    .append(sentenceTag)
-                    .append(deleteTag)
-            );
-        }
-
-        $('#id_examples').listview('refresh');
-    });
+    socket.on('res_example', fnOnResExample);
 
     $('#id_btn_play_all').click(function(){
         $('#id_page_dialog_speak').popup('open');
@@ -158,32 +161,32 @@ $(document).ready(function(){
     });
 
     $('#id_new_example').keyup(function(event){
-                 if (event.keyCode == 13) {
-                     $('#id_btn_send_new_example').click();
-                 }
-             });
+        if (event.keyCode == 13) {
+            $('#id_btn_send_new_example').click();
+        }
+    });
 
-             $('#id_page_dialog_speak').bind({
-                 popupafterclose: function(event, ui){
-                     if (window.nextSpeak){
-                         clearTimeout(window.nextSpeak);
-                         window.nextSpeak = null;
-                     }
-                     responsiveVoice.cancel();
-                 }
-             });
+    $('#id_page_dialog_speak').bind({
+        popupafterclose: function(event, ui){
+            if (window.nextSpeak){
+                clearTimeout(window.nextSpeak);
+                window.nextSpeak = null;
+            }
+            responsiveVoice.cancel();
+        }
+    });
 
-             $(window).keypress(function(e) {
-                 var popupElem = $('#id_page_dialog_add');
-                 if (popupElem.parent().hasClass("ui-popup-active")){
-                     return;
-                 }
-                 var ev = e || window.event;
-                 var key = ev.keyCode || ev.which;
-                 if (key == 105){
-                     $('#id_btn_dialog_add').click();
-                     return false;
-                 }
-             });
-         }); // ready()
+    $(window).keypress(function(e) {
+        var popupElem = $('#id_page_dialog_add');
+        if (popupElem.parent().hasClass("ui-popup-active")){
+            return;
+        }
+        var ev = e || window.event;
+        var key = ev.keyCode || ev.which;
+        if (key == 105){
+            $('#id_btn_dialog_add').click();
+            return false;
+        }
+    });
+}); // ready()
 

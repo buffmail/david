@@ -36,14 +36,23 @@ function GetTotalDays(dateStr, dayOffset){
     return Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
 }
 
-function fnGetDayJson(jsonObjs, dayOffset, prevSide){
+function GetDayJson(jsonObjs, dayOffset, random, prevSide){
     var todayStr = GetDateStr(new Date())
     var reqDays = GetTotalDays(todayStr, dayOffset);
     var nowDays = GetTotalDays(todayStr, 0);
 
     var len = jsonObjs.length
-    for (var i = 0; i < len; i++)
-    {
+
+    if (random){
+        console.assert(len != 0, "length should be greater than 0")
+
+        randIdx = Math.floor((Math.random() * len));
+        var jsonObj = jsonObjs[randIdx]
+        var days = GetTotalDays(jsonObj.date, 0);
+        return [days - nowDays, jsonObj]
+    }
+
+    for (var i = 0; i < len; i++){
         var jsonObj = jsonObjs[i];
         var days = GetTotalDays(jsonObj.date, 0);
         if (reqDays < days) {
@@ -92,7 +101,7 @@ function AddExample(jsonObjs, example){
 }
 
 function DeleteExample(jsonObjs, reqOffset, index){
-    var rets = fnGetDayJson(jsonObjs, reqOffset, true);
+    var rets = GetDayJson(jsonObjs, reqOffset, false, true);
     var dayOffset = rets[0];
     var jsonObj = rets[1]
     if (dayOffset != reqOffset){
@@ -123,7 +132,9 @@ io2.sockets.on('connection', function(socket){
     socket.on('req_example', function(data){
         var reqDayOffset = data.day_offset;
         var delta = data.delta;
-        var ret = fnGetDayJson(jsonObjs, reqDayOffset + delta, delta < 0);
+        var random = data.random;
+        var ret = GetDayJson(jsonObjs, reqDayOffset + delta, random
+                             , delta < 0);
         var dayOffset = ret[0];
         var jsonObj = ret[1];
         if (!jsonObj){

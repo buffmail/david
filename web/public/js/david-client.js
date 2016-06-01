@@ -129,6 +129,7 @@ $(document).ready(function(){
     socket.emit('req_example'
                 ,{day_offset:0
                   , delta:0
+                  , random:false
                   , daily_base:window.dailyBase});
 
     socket.on('res_example', fnOnResExample);
@@ -143,6 +144,7 @@ $(document).ready(function(){
         socket.emit('req_example'
                     , {day_offset:window.dayOffset
                        , delta:-1
+                       , random:false
                        , daily_base:window.dailyBase});
     });
 
@@ -153,11 +155,21 @@ $(document).ready(function(){
         $('#id_new_example').val('');
     });
 
+    $('#id_btn_day_random').click(function(){
+        $(this).removeClass('ui-btn-active');
+        socket.emit('req_example'
+                    ,{day_offset:window.dayOffset
+                      , delta:0
+                      , random:true
+                      , daily_base:window.dailyBase});
+    });
+
     $('#id_btn_day_next').click(function(){
         $(this).removeClass('ui-btn-active');
         socket.emit('req_example',
                     {day_offset:window.dayOffset
                      , delta:1
+                     , random:false
                      , daily_base:window.dailyBase});
     });
 

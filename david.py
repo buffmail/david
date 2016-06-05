@@ -5,11 +5,16 @@ import webbrowser
 import logging
 import win32gui
 import win32api
+import win32process
+import wmi
 from Tkinter import Tk
 import traceback
 
 ENDIC_URL = 'http://m.endic.naver.com/search.nhn?query={}&searchOption='
 DIC_URL = 'http://dictionary.reference.com/browse/{}?s=t'
+
+BROWSER_PROC_NAME = u'chrome.exe'
+BROWSER_WINDOW_NAME= 'Chrome_WidgetWin_1'
 
 def openDic(rawKeyword):
     keyword = rawKeyword.split('\n')[0].strip(",.\r\n")
@@ -18,6 +23,22 @@ def openDic(rawKeyword):
         webbrowser.open(url.format(keyword))
 
 def adjustWinPos():
+    _, forePid = win32process.GetWindowThreadProcessId(
+        win32gui.GetForegroundWindow())
+
+    querystr = ('SELECT Name FROM Win32_Process '
+                'WHERE ProcessId = {0}').format(forePid)
+
+    procNames = [p.Name for p in wmi.WMI().query(querystr)]
+    if not procNames:
+        logging.warn('no foreground window.')
+        return
+
+    if procNames[0] == BROWSER_PROC_NAME:
+        logging.info('browser is foreground window, skipping'
+                     ' adjust position')
+        return
+
     adjustWinPos.chromeWin = None
 
     def callback(hwnd, name):
@@ -28,7 +49,7 @@ def adjustWinPos():
             logging.info('found {} '.format(name))
             adjustWinPos.chromeWin = hwnd
 
-    win32gui.EnumWindows(callback, 'Chrome_WidgetWin_1')
+    win32gui.EnumWindows(callback, BROWSER_WINDOW_NAME)
 
     if adjustWinPos.chromeWin:
         screenInfo = win32api.GetMonitorInfo(1)

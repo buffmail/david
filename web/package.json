@@ -9,9 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^0.20.0",
     "express": "^4.13.4",
     "left-pad": "^1.0.1",
     "pug": "^2.0.0-alpha7",
-    "socket.io": "^1.4.5"
+    "socket.io": "^1.4.5",
+    "util": "^0.10.3"
   }
 }

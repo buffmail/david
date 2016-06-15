@@ -15,53 +15,55 @@ var USER_AGENT = 'Mozilla/5.0 ' +
     'Chrome/39.0.2171.99 Safari/537.36'
 
 var fnGetWordPage = function(err, res, html){
+    "use strict";
     if (err){
         console.log(err);
         return;
     }
 
-    var $ = cheerio.load(html);
-    var wordEntry = $("div.entry_word > h3.h_word").text();
+    let $ = cheerio.load(html);
+    let wordEntry = trim($("div.entry_word > h3.h_word").text());
     console.log(wordEntry);
 
-    var pronoun = $("span.pronun").text();
+    let pronoun = trim($("span.pronun").text());
     console.log(pronoun);
 
-    var sentence = ''
-    var count = 0;
-    var examples = $("li.example_itm > p.example_stc");
+    let sentence = ''
 
     function PrintSentence(exampleTag){
-        var elem = $(exampleTag)
-        var liTag = elem.parent();
-        if (liTag.css("display") == "none")
-            return;
-        var sentence = ''
+        let elem = $(exampleTag)
+        let sentence = ''
 
         elem.contents().each(function(){
             switch (this.nodeType){
             case 1: // Node.ELEMENT_NODE
-                var childElem = $(this);
+                let childElem = $(this);
                 if (childElem.prop("tagName") == "SPAN" &&
                     childElem.hasClass("autolink")){
                     if (sentence)
                         sentence += ' ';
-                    sentence += $(this).text();
+                    sentence += childElem.text();
                 }
                 break;
 
             case 3: // Node.TEXT_NODE
-                sentence += trim(this.data);
+                let lawtext = trim(this.data);
+                if (!lawtext)
+                    break;
+                if (sentence && lawtext != ".")
+                    sentence += ' ';
+                sentence += lawtext;
                 break;
             }
         });
         console.log(sentence)
     };
 
-    for (var i in examples){
-        if ($(examples[i]).css("visible") != "none")
-            PrintSentence(examples[i]);
-    }
+    let examples = $("li.example_itm > p.example_stc");
+    examples.each(function(){
+        if ($(this.parent).css("display") != "none")
+            PrintSentence(this);
+    });
 }
 
 request(

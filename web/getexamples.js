@@ -1,43 +1,39 @@
-var request = require('request');
-var cheerio = require('cheerio');
-var util = require('util');
-var trim = require('trim');
+"use strict";
+const request = require('request');
+const cheerio = require('cheerio');
+const util = require('util');
+const trim = require('trim');
 
 var engword = 'contribution'
-var urlbase = 'http://m.endic.naver.com/'
-var url1 = util.format("%ssearch.nhn?query=%s&searchOption=",
-                       urlbase, engword);
-var url2 = ''
+const URL_BASE = 'http://m.endic.naver.com/'
 
-var USER_AGENT = 'Mozilla/5.0 ' +
+const USER_AGENT = 'Mozilla/5.0 ' +
     '(Macintosh; Intel Mac OS X 10_10_1) ' +
     'AppleWebKit/537.36 (KHTML, like Gecko) ' +
     'Chrome/39.0.2171.99 Safari/537.36'
 
-var fnGetWordPage = function(err, res, html){
-    "use strict";
+function GetWordPage(err, res, html){
+
     if (err){
         console.log(err);
         return;
     }
 
-    let $ = cheerio.load(html);
-    let wordEntry = trim($("div.entry_word > h3.h_word").text());
+    const $ = cheerio.load(html);
+    const wordEntry = trim($("div.entry_word > h3.h_word").text());
     console.log(wordEntry);
 
-    let pronoun = trim($("span.pronun").text());
+    const pronoun = trim($("span.pronun").text());
     console.log(pronoun);
 
-    let sentence = ''
-
     function PrintSentence(exampleTag){
-        let elem = $(exampleTag)
+        const elem = $(exampleTag)
         let sentence = ''
 
         elem.contents().each(function(){
             switch (this.nodeType){
             case 1: // Node.ELEMENT_NODE
-                let childElem = $(this);
+                const childElem = $(this);
                 if (childElem.prop("tagName") == "SPAN" &&
                     childElem.hasClass("autolink")){
                     if (sentence)
@@ -47,24 +43,23 @@ var fnGetWordPage = function(err, res, html){
                 break;
 
             case 3: // Node.TEXT_NODE
-                let lawtext = trim(this.data);
-                if (!lawtext)
+                const rawtext = trim(this.data);
+                if (!rawtext)
                     break;
-                if (sentence && lawtext != ".")
+                if (sentence && rawtext != ".")
                     sentence += ' ';
-                sentence += lawtext;
+                sentence += rawtext;
                 break;
             }
         });
         console.log(sentence);
     };
 
-    let examples = $("li.example_itm");
+    const examples = $("li.example_itm");
     examples.children().each(function(){
-        let elem = $(this);
+        const elem = $(this);
         if (elem.parent().css("display") == "none")
             return;
-        let sentence = '';
         if (elem.prop("tagName") == "P" &&
             elem.hasClass("example_stc"))
             PrintSentence(this);
@@ -74,15 +69,18 @@ var fnGetWordPage = function(err, res, html){
     });
 }
 
+if (process.argv.length > 2)
+    engword = process.argv[2];
+
 request(
-    url1,
+    util.format("%ssearch.nhn?query=%s&searchOption=", URL_BASE, engword),
     function(err, res, html){
-        var $ = cheerio.load(html);
-        var formTag = $("form")[0]
-        url2 = urlbase + formTag['attribs']['action']
+        const $ = cheerio.load(html);
+        const formTag = $("form")[0]
+        const redirUrl = URL_BASE + formTag['attribs']['action']
         request(
-            {url:url2, headers:{'User-Agent': USER_AGENT}},
-            fnGetWordPage
+            {url:redirUrl, headers:{'User-Agent': USER_AGENT}},
+            GetWordPage
         );
     }
 );

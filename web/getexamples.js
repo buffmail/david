@@ -1,6 +1,7 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var util = require('util');
+var trim = require('trim');
 
 var engword = 'word'
 var urlbase = 'http://m.endic.naver.com/'
@@ -30,23 +31,37 @@ var fnGetWordPage = function(err, res, html){
     var count = 0;
     var examples = $("li.example_itm > p.example_stc");
 
-    function GetExample(exampleTag){
+    function PrintSentence(exampleTag){
         var elem = $(exampleTag)
         var liTag = elem.parent();
         if (liTag.css("display") == "none")
             return;
         var sentence = ''
-        elem.children().each(function(){
-            if ($(this).prop("tagName") == "SPAN" &&
-                $(this).hasClass("autolink")){
-                sentence += $(this).text() + ' ';
+
+        elem.contents().each(function(){
+            switch (this.nodeType){
+            case 1: // Node.ELEMENT_NODE
+                var childElem = $(this);
+                if (childElem.prop("tagName") == "SPAN" &&
+                    childElem.hasClass("autolink")){
+                    if (sentence)
+                        sentence += ' ';
+                    sentence += $(this).text();
+                }
+                break;
+
+            case 3: // Node.TEXT_NODE
+                sentence += trim(this.data);
+                break;
             }
         });
         console.log(sentence)
-        console.log(elem.contents().not(elem.children()).text());
     };
 
-    GetExample(examples[0]);
+    for (var i in examples){
+        if ($(examples[i]).css("visible") != "none")
+            PrintSentence(examples[i]);
+    }
 }
 
 request(

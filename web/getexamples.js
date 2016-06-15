@@ -3,7 +3,7 @@ var cheerio = require('cheerio');
 var util = require('util');
 var trim = require('trim');
 
-var engword = 'word'
+var engword = 'contribution'
 var urlbase = 'http://m.endic.naver.com/'
 var url1 = util.format("%ssearch.nhn?query=%s&searchOption=",
                        urlbase, engword);
@@ -56,13 +56,21 @@ var fnGetWordPage = function(err, res, html){
                 break;
             }
         });
-        console.log(sentence)
+        console.log(sentence);
     };
 
-    let examples = $("li.example_itm > p.example_stc");
-    examples.each(function(){
-        if ($(this.parent).css("display") != "none")
+    let examples = $("li.example_itm");
+    examples.children().each(function(){
+        let elem = $(this);
+        if (elem.parent().css("display") == "none")
+            return;
+        let sentence = '';
+        if (elem.prop("tagName") == "P" &&
+            elem.hasClass("example_stc"))
             PrintSentence(this);
+        if (elem.prop("tagName") == "P" &&
+            elem.hasClass("example_mean"))
+            console.log(elem.text());
     });
 }
 

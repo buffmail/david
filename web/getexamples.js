@@ -13,7 +13,6 @@ const USER_AGENT = 'Mozilla/5.0 ' +
     'Chrome/39.0.2171.99 Safari/537.36'
 
 function GetWordPage(err, res, html){
-
     if (err){
         console.log(err);
         return;
@@ -22,6 +21,10 @@ function GetWordPage(err, res, html){
     const $ = cheerio.load(html);
     const wordEntry = trim($("div.entry_word > h3.h_word").text());
     console.log(wordEntry);
+
+    $("div.entry_word > p.desc_lst > span.desc").each(function(){
+        console.log($(this).text());
+    });
 
     const pronoun = trim($("span.pronun").text());
     console.log(pronoun);

@@ -26,8 +26,9 @@ function GetWordPage(err, res, html){
         console.log($(this).text());
     });
 
-    const pronoun = trim($("span.pronun").text());
-    console.log(pronoun);
+    $("span.pronun").each(function(){
+        console.log(trim($(this).text()));
+    });
 
     function PrintSentence(exampleTag){
         const elem = $(exampleTag)
@@ -72,19 +73,30 @@ function GetWordPage(err, res, html){
     });
 }
 
+function RoutePage(err, res, html){
+    const $ = cheerio.load(html);
+
+    const firstTag = $("div.word_wrap > a.h_word")[0];
+    if (!firstTag){
+        console.log('Cannot find redir url');
+        return;
+    }
+
+    const redirUrl = URL_BASE + firstTag.attribs.href;
+    request(
+        {url:redirUrl, headers:{'User-Agent': USER_AGENT}},
+        GetWordPage
+    );
+}
+
 if (process.argv.length > 2)
     engword = process.argv[2];
 
+const initUrl = util.format(
+    "%ssearch.nhn?searchOption=all&query=%s&=", URL_BASE, engword);
+
 request(
-    util.format("%ssearch.nhn?query=%s&searchOption=", URL_BASE, engword),
-    function(err, res, html){
-        const $ = cheerio.load(html);
-        const formTag = $("form")[0]
-        const redirUrl = URL_BASE + formTag['attribs']['action']
-        request(
-            {url:redirUrl, headers:{'User-Agent': USER_AGENT}},
-            GetWordPage
-        );
-    }
+    {url:initUrl, headers:{'User-Agent': USER_AGENT}},
+    RoutePage
 );
 

@@ -54,7 +54,7 @@ function GetDayJson(jsonObjs, dayOffset, random, prevSide){
     }
 
     for (var i = 0; i < len; i++){
-        const jsonObj = jsonObjs[i];
+        let jsonObj = jsonObjs[i];
         const days = GetTotalDays(jsonObj.date, 0);
         if (reqDays < days) {
             if (i == 0) {

@@ -1,14 +1,15 @@
-var express = require('express')
-var app = express()
-var io = require('socket.io');
-var fs = require('fs');
-var url = require('url');
-var leftpad = require('left-pad');
+"use strict";
+let express = require('express')
+let app = express()
+let io = require('socket.io');
+let fs = require('fs');
+let url = require('url');
+let leftpad = require('left-pad');
 
 const PORT=8080;
 const JSON_FILE_NAME = 'data.json';
 
-var jsonObjs = JSON.parse(fs.readFileSync(JSON_FILE_NAME, 'utf8'));
+let jsonObjs = JSON.parse(fs.readFileSync(JSON_FILE_NAME, 'utf8'));
 
 app.use(express.static(__dirname + '/bower_components'));
 app.use(express.static(__dirname + '/public'));
@@ -22,7 +23,7 @@ app.use(function(req, res, next){
     res.status(404).render('404', {url: req.originalUrl});
 });
 
-var io2 = io.listen(app.listen(PORT));
+const io2 = io.listen(app.listen(PORT));
 
 function GetDateStr(date){
     return date.getFullYear() + '-'
@@ -31,35 +32,35 @@ function GetDateStr(date){
 }
 
 function GetTotalDays(dateStr, dayOffset){
-    var d = new Date(dateStr);
+    const d = new Date(dateStr);
     d.setDate(d.getDate() + dayOffset);
     return Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
 }
 
 function GetDayJson(jsonObjs, dayOffset, random, prevSide){
-    var todayStr = GetDateStr(new Date())
-    var reqDays = GetTotalDays(todayStr, dayOffset);
-    var nowDays = GetTotalDays(todayStr, 0);
+    const todayStr = GetDateStr(new Date())
+    const reqDays = GetTotalDays(todayStr, dayOffset);
+    const nowDays = GetTotalDays(todayStr, 0);
 
-    var len = jsonObjs.length
+    const len = jsonObjs.length
 
     if (random){
         console.assert(len != 0, "length should be greater than 0")
 
-        randIdx = Math.floor((Math.random() * len));
-        var jsonObj = jsonObjs[randIdx]
-        var days = GetTotalDays(jsonObj.date, 0);
+        const randIdx = Math.floor((Math.random() * len));
+        const jsonObj = jsonObjs[randIdx]
+        const days = GetTotalDays(jsonObj.date, 0);
         return [days - nowDays, jsonObj]
     }
 
     for (var i = 0; i < len; i++){
-        var jsonObj = jsonObjs[i];
-        var days = GetTotalDays(jsonObj.date, 0);
+        const jsonObj = jsonObjs[i];
+        const days = GetTotalDays(jsonObj.date, 0);
         if (reqDays < days) {
             if (i == 0) {
                 return [days - nowDays, jsonObj];
             }
-            var idx = prevSide ? i - 1 : i;
+            const idx = prevSide ? i - 1 : i;
             jsonObj = jsonObjs[idx];
             days = GetTotalDays(jsonObj.date, 0);
             return [days - nowDays, jsonObj];
@@ -76,13 +77,13 @@ function GetDayJson(jsonObjs, dayOffset, random, prevSide){
 }
 
 function AddExample(jsonObjs, example){
-    var nowDays = GetTotalDays(GetDateStr(new Date()), 0);
-    var resultJsonObj = null;
+    const nowDays = GetTotalDays(GetDateStr(new Date()), 0);
+    let resultJsonObj = null;
 
-    var len = jsonObjs.length
-    for (var i = 0; i < len; i++){
-        var jsonObj = jsonObjs[i];
-        var days = GetTotalDays(jsonObj.date, 0);
+    const len = jsonObjs.length
+    for (let i = 0; i < len; i++){
+        const jsonObj = jsonObjs[i];
+        const days = GetTotalDays(jsonObj.date, 0);
 
         if (days == nowDays) {
             resultJsonObj = jsonObj;
@@ -91,7 +92,7 @@ function AddExample(jsonObjs, example){
     }
 
     if (!resultJsonObj){
-        var dateStr = GetDateStr(new Date());
+        const dateStr = GetDateStr(new Date());
         resultJsonObj = {date:dateStr, data:[]};
         jsonObjs.push(resultJsonObj);
     }
@@ -101,9 +102,9 @@ function AddExample(jsonObjs, example){
 }
 
 function DeleteExample(jsonObjs, reqOffset, index){
-    var rets = GetDayJson(jsonObjs, reqOffset, false, true);
-    var dayOffset = rets[0];
-    var jsonObj = rets[1]
+    const rets = GetDayJson(jsonObjs, reqOffset, false, true);
+    const dayOffset = rets[0];
+    const jsonObj = rets[1]
     if (dayOffset != reqOffset){
         console.log('reqOffset', reqOffset, ' mismatch dayoffset'
                     , dayOffset)
@@ -124,42 +125,42 @@ function DeleteExample(jsonObjs, reqOffset, index){
 }
 
 io2.sockets.on('connection', function(socket){
-    var connId = socket.conn.id;
+    const connId = socket.conn.id;
     console.log("connected " + connId);
     socket.on('disconnection', function(){
         console.log("disconnected " + connId);
     });
     socket.on('req_example', function(data){
-        var reqDayOffset = data.day_offset;
-        var delta = data.delta;
-        var random = data.random;
-        var ret = GetDayJson(jsonObjs, reqDayOffset + delta, random
+        const reqDayOffset = data.day_offset;
+        const delta = data.delta;
+        const random = data.random;
+        const ret = GetDayJson(jsonObjs, reqDayOffset + delta, random
                              , delta < 0);
-        var dayOffset = ret[0];
-        var jsonObj = ret[1];
+        const dayOffset = ret[0];
+        const jsonObj = ret[1];
         if (!jsonObj){
             console.log('empty json data');
             return;
         }
-        var retJsonObj = JSON.parse(JSON.stringify(jsonObj));
+        let retJsonObj = JSON.parse(JSON.stringify(jsonObj));
         retJsonObj.day_offset = dayOffset;
         retJsonObj.daily_base = data.daily_base;
         socket.emit('res_example', retJsonObj);
     });
     socket.on('add_example', function(data){
-        var example = data.example;
-        var jsonObj = AddExample(jsonObjs, example);
-        var retJsonObj = JSON.parse(JSON.stringify(jsonObj));
+        const example = data.example;
+        const jsonObj = AddExample(jsonObjs, example);
+        let retJsonObj = JSON.parse(JSON.stringify(jsonObj));
         retJsonObj.day_offset = 0;
         retJsonObj.daily_base = data.daily_base;
         socket.emit('res_example', retJsonObj);
     });
     socket.on('delete_example', function(data){
-        var reqDayOffset = data.day_offset;
-        var index = data.index;
-        jsonObj = DeleteExample(jsonObjs, reqDayOffset, index);
+        const reqDayOffset = data.day_offset;
+        const index = data.index;
+        const jsonObj = DeleteExample(jsonObjs, reqDayOffset, index);
         if (jsonObj){
-            var retJsonObj = JSON.parse(JSON.stringify(jsonObj))
+            let retJsonObj = JSON.parse(JSON.stringify(jsonObj))
             retJsonObj.day_offset = reqDayOffset;
             retJsonObj.daily_base = data.daily_base;
             socket.emit('res_example', retJsonObj);

@@ -5,25 +5,25 @@ window.examples = {};
 window.nextSpeak = null;
 window.dailyBase = true;
 
-var fnPlay = function(i, n){
+function fnPlay (i, n){
 
     if (window.nextSpeak){
         clearTimeout(window.nextSpeak);
         window.nextSpeak = null;
     }
 
-    var fnDelayPlay = function(index, repeatCount, next){
-        var speaker = $('#id_voices').val();
-        var timeoutVal = $('#id_slide_delay').val() * 1000;
+    const fnDelayPlay = function(index, repeatCount, next){
+        const speaker = $('#id_voices').val();
+        const timeoutVal = $('#id_slide_delay').val() * 1000;
         if (!(index in window.examples)){
             return;
         }
-        var example = window.examples[index].example;
-        var onNext = function(){
-            var nextIndex = index;
-            var nextRepeatCount = repeatCount + 1;
+        const example = window.examples[index].example;
+        const onNext = function(){
+            let nextIndex = index;
+            let nextRepeatCount = repeatCount + 1;
             if (next) {
-                var repeatVal = $('#id_slide_repeat').val();
+                const repeatVal = $('#id_slide_repeat').val();
                 if (repeatCount >= repeatVal){
                     nextIndex = index + 1;
                     nextRepeatCount = 1;
@@ -39,7 +39,7 @@ var fnPlay = function(i, n){
                                  , next),
                 timeoutVal);
         };
-        var titleSentence = 'Playing (' + (index+1).toString() +
+        const titleSentence = 'Playing (' + (index+1).toString() +
             '/' +
             window.examples.length.toString() +
             ')';
@@ -51,66 +51,66 @@ var fnPlay = function(i, n){
     fnDelayPlay(i, 1, n);
 };
 
-var socket = io.connect('http://' + location.host);
+let socket = io.connect('http://' + location.host);
 
-var fnOnResExample = function(jsonData){
+function fnOnResExample(jsonData){
 
     window.dayOffset = jsonData.day_offset;
     window.examples = jsonData.data;
     window.dailyBase = jsonData.daily_base
 
-    var d = new Date(jsonData.date);
+    const d = new Date(jsonData.date);
 
-    var fnGetIdxOfWeek = function(date){
-        var oneJan = new Date(date.getFullYear(), 0, 1);
-        var daysFromOneJan = Math.floor(
+    function fnGetIdxOfWeek(date){
+        const oneJan = new Date(date.getFullYear(), 0, 1);
+        const daysFromOneJan = Math.floor(
             (date - oneJan) / (60*60*24*1000));
-        var startDayOffset = 7 - oneJan.getDay();
-        var idx = Math.floor(
+        const startDayOffset = 7 - oneJan.getDay();
+        const idx = Math.floor(
             (daysFromOneJan - date.getDay() - startDayOffset)
                 / 7);
         return idx;
     }
 
-    var weekNum = fnGetIdxOfWeek(d) + 1;
-    var dayStr = '일월화수목금토'[d.getDay()];
-    var numStr = window.examples.length.toString();
-    var dateStr = jsonData.date + ' (w'
+    const weekNum = fnGetIdxOfWeek(d) + 1;
+    const dayStr = '일월화수목금토'[d.getDay()];
+    const numStr = window.examples.length.toString();
+    const dateStr = jsonData.date + ' (w'
         + weekNum + ','
         + dayStr + ','
         + numStr + ')';
     $('#id_date').text(dateStr);
     $('#id_examples').empty();
 
-    var len = examples.length;
-    for (var i=0; i<len; i++)
+    const len = examples.length;
+    for (let i=0; i<len; i++)
     {
-        var example = examples[i].example;
-        var word = examples[i].word;
-        var sentence = example.replace(
+        const example = examples[i].example;
+        const word = examples[i].word;
+        let sentence = example.replace(
             word,
             $('<strong/>').text(word).prop('outerHTML'));
         sentence = (i+1).toString() + '. ' + sentence;
 
-        var sentenceTag =
+        const sentenceTag =
             $('<a href="#" style="white-space: normal;"/>')
             .append(sentence);
 
-        var play = function(idx){
+        function play(idx){
             $('#id_page_dialog_speak').popup('open');
             fnPlay(idx, false);
         };
 
         sentenceTag.click(play.bind(this, i));
 
-        var fnDeleteExample = function(dayOffset, index){
+        let fnDeleteExample = function(dayOffset, index){
             socket.emit('delete_example'
                         , {day_offset:dayOffset
                            , index:index
                            , daily_base:window.dailyBase});
         };
 
-        var deleteTag = $('<a href="#" data-icon="delete"/>');
+        const deleteTag = $('<a href="#" data-icon="delete"/>');
         deleteTag.click(
             fnDeleteExample.bind(this, dayOffset, i));
 
@@ -174,8 +174,8 @@ $(document).ready(function(){
     });
 
     $('#id_btn_send_new_example').click(function(){
-        var inputElem = $('#id_new_example');
-        var example = inputElem.val();
+        const inputElem = $('#id_new_example');
+        const example = inputElem.val();
         if (example.length == 0)
             return;
         socket.emit('add_example'
@@ -215,24 +215,24 @@ $(document).ready(function(){
     });
 
     $(window).keypress(function(e) {
-        var popupElem = $('#id_page_dialog_add');
+        const popupElem = $('#id_page_dialog_add');
         if (popupElem.parent().hasClass("ui-popup-active")){
             return;
         }
-        var ev = e || window.event;
-        var key = ev.keyCode || ev.which;
+        const ev = e || window.event;
+        const key = ev.keyCode || ev.which;
         if (key == 105){
             $('#id_btn_dialog_add').click();
             return false;
         }
     });
 
-    var timeoutVal = Cookies.get('slide_delay');
+    const timeoutVal = Cookies.get('slide_delay');
     if (timeoutVal !== undefined){
         $('#id_slide_delay').val(timeoutVal);
     }
 
-    var repeatCount = Cookies.get('repeat_count');
+    const repeatCount = Cookies.get('repeat_count');
     if (repeatCount !== undefined)
     {
         $('#id_slide_repeat').val(repeatCount);

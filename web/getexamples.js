@@ -18,16 +18,18 @@ function GetWordPage(err, res, html){
         return;
     }
 
+    let word = {word:'', definitions:[], pronounciations:[],
+               examples:[]};
+
     const $ = cheerio.load(html);
-    const wordEntry = trim($("div.entry_word > h3.h_word").text());
-    console.log(wordEntry);
+    word.word = trim($("div.entry_word > h3.h_word").text());
 
     $("div.entry_word > p.desc_lst > span.desc").each(function(){
-        console.log($(this).text());
+        word.definitions.push($(this).text());
     });
 
     $("span.pronun").each(function(){
-        console.log(trim($(this).text()));
+        word.pronounciations.push(trim($(this).text()));
     });
 
     function PrintSentence(exampleTag){
@@ -56,21 +58,28 @@ function GetWordPage(err, res, html){
                 break;
             }
         });
-        console.log(sentence);
+        return sentence
     };
 
-    const examples = $("li.example_itm");
-    examples.children().each(function(){
+    let example = {};
+    const exampleTags = $("li.example_itm");
+    exampleTags.children().each(function(){
         const elem = $(this);
         if (elem.parent().css("display") == "none")
             return;
         if (elem.prop("tagName") == "P" &&
             elem.hasClass("example_stc"))
-            PrintSentence(this);
+            example.sentence = PrintSentence(this);
         if (elem.prop("tagName") == "P" &&
             elem.hasClass("example_mean"))
-            console.log(elem.text());
+            example.meaning = elem.text();
+        if (example.sentence && example.meaning){
+            word.examples.push(example);
+            example = {};
+        }
     });
+
+    console.log(word);
 }
 
 function RoutePage(err, res, html){
@@ -89,14 +98,17 @@ function RoutePage(err, res, html){
     );
 }
 
+function GetExample(engword){
+    const initUrl = util.format(
+        "%ssearch.nhn?searchOption=all&query=%s&=", URL_BASE, engword);
+
+    request(
+        {url:initUrl, headers:{'User-Agent': USER_AGENT}},
+        RoutePage
+    );
+}
+
 if (process.argv.length > 2)
     engword = process.argv[2];
 
-const initUrl = util.format(
-    "%ssearch.nhn?searchOption=all&query=%s&=", URL_BASE, engword);
-
-request(
-    {url:initUrl, headers:{'User-Agent': USER_AGENT}},
-    RoutePage
-);
-
+GetExample(engword);

@@ -1,0 +1,34 @@
+doctype html
+html(lang="en")
+  head
+    meta(http-equiv="Content-Type"
+      content="text/html; charset=utf-8")
+    meta(name="viewport"
+      content="width=device-width, initial-scale=1.0")
+    script(src='http://code.jquery.com/jquery-1.11.3.min.js')
+    script(src="http://code.jquery.com/mobile/1.4.5"
+      +"/jquery.mobile-1.4.5.min.js")
+    script(src='/socket.io/socket.io.js')
+    script(src='/js-cookie/src/js.cookie.js')
+    script(type='text/javascript').
+      "use strict";
+      let socket = io.connect('http://' + location.host);
+      $(document).ready(function(){
+        socket.emit('req_word', {word:'word'});
+        socket.on('res_word', function(data){
+          $('#id_title').text(data.word);
+        });
+      });
+
+    link(rel='stylesheet'
+      href="http://code.jquery.com/mobile/1.4.5"
+        +"/jquery.mobile-1.4.5.min.css")
+    title naver endic examples
+  body
+    div(data-role="page" id="id_page_main")
+      div(data-role="header")
+        h3(id="id_title" style="margin: 0; width: 100%;") endic examples
+        div(data-role="navbar")
+
+      ul(id="id_examples" data-role="listview" data-theme="g")
+

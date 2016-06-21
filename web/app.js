@@ -5,6 +5,7 @@ let io = require('socket.io');
 let fs = require('fs');
 let url = require('url');
 let leftpad = require('left-pad');
+let get_examples = require('./get_examples');
 
 const PORT=8080;
 const JSON_FILE_NAME = 'data.json';
@@ -17,6 +18,9 @@ app.set('view engine', 'pug')
 app.set('views', __dirname + '/views');
 app.get('/', function(req, res) {
     res.render('index');
+});
+app.get('/get_examples', function(req, res) {
+    res.render('get_examples');
 });
 
 app.use(function(req, res, next){
@@ -165,6 +169,12 @@ io2.sockets.on('connection', function(socket){
             retJsonObj.daily_base = data.daily_base;
             socket.emit('res_example', retJsonObj);
         }
+    });
+    socket.on('req_word', function(data){
+        const word = data.word;
+        get_examples(word, function(retObj){
+            socket.emit('res_word', retObj);
+        });
     });
 });
 

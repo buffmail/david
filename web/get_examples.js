@@ -4,7 +4,6 @@ const cheerio = require('cheerio');
 const util = require('util');
 const trim = require('trim');
 
-var engword = 'contribution'
 const URL_BASE = 'http://m.endic.naver.com/'
 
 const USER_AGENT = 'Mozilla/5.0 ' +
@@ -79,10 +78,10 @@ function GetWordPage(err, res, html){
         }
     });
 
-    console.log(word);
+    return word;
 }
 
-function RoutePage(err, res, html){
+function RoutePage(err, res, html, callback){
     const $ = cheerio.load(html);
 
     const firstTag = $("div.word_wrap > a.h_word")[0];
@@ -94,21 +93,23 @@ function RoutePage(err, res, html){
     const redirUrl = URL_BASE + firstTag.attribs.href;
     request(
         {url:redirUrl, headers:{'User-Agent': USER_AGENT}},
-        GetWordPage
+        function(err, res, html){
+            let retObj = GetWordPage(err, res, html);
+            callback(retObj);
+        }
     );
 }
 
-function GetExample(engword){
+function get_examples(engword, callback){
     const initUrl = util.format(
         "%ssearch.nhn?searchOption=all&query=%s&=", URL_BASE, engword);
 
     request(
         {url:initUrl, headers:{'User-Agent': USER_AGENT}},
-        RoutePage
+        function(err, res, html){
+            RoutePage(err, res, html, callback);
+        }
     );
 }
 
-if (process.argv.length > 2)
-    engword = process.argv[2];
-
-GetExample(engword);
+module.exports = get_examples;

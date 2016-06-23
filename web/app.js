@@ -174,7 +174,6 @@ io2.sockets.on('connection', function(socket){
         const word = data.word;
         get_examples(word, function(retObj){
             socket.emit('res_word', retObj);
-            console.log(retObj);
         });
     });
 });

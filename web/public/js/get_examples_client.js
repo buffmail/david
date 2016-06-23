@@ -28,6 +28,32 @@ function HandleWordResponse(data){
     });
     $('#id_pronoun').text(pronoun);
     $('#id_definition').text(definition);
+
+    const examples = data.examples;
+    const len = examples.length;
+    for (let i=0; i<len; i++)
+    {
+        const sentence = examples[i].sentence;
+        const meaning = examples[i].meaning;
+
+        const sentenceTag =
+            $('<a href="#" style="white-space: normal; padding: 0px 0px 0px 20px;"/>')
+              .append(
+                  $('<p style="white-space: normal; margin: 10px 0px 10px 0px;"/>').append(
+                      $('<strong/>').append(sentence)))
+              .append($('<p style="white-space: normal; margin: 10px 0px 10px 0px;"/>').append(
+                  meaning));
+
+        const addTag = $('<a href="#" data-icon="plus"/>');
+
+        $('#id_examples').append(
+            $('<li/>')
+                .append(sentenceTag)
+                .append(addTag)
+        );
+    }
+
+    $('#id_examples').listview('refresh');
 }
 
 $(document).ready(function(){

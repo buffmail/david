@@ -59,7 +59,7 @@ function GetDayJson(jsonObjs, dayOffset, random, prevSide){
 
     for (var i = 0; i < len; i++){
         let jsonObj = jsonObjs[i];
-        const days = GetTotalDays(jsonObj.date, 0);
+        let days = GetTotalDays(jsonObj.date, 0);
         if (reqDays < days) {
             if (i == 0) {
                 return [days - nowDays, jsonObj];
@@ -174,6 +174,7 @@ io2.sockets.on('connection', function(socket){
         const word = data.word;
         get_examples(word, function(retObj){
             socket.emit('res_word', retObj);
+            console.log(retObj);
         });
     });
 });

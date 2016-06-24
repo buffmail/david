@@ -39,9 +39,9 @@ function HandleWordResponse(data){
         const sentenceTag =
             $('<a href="#" style="white-space: normal; padding: 0px 0px 0px 20px;"/>')
               .append(
-                  $('<p style="white-space: normal; margin: 10px 0px 10px 0px;"/>').append(
-                      $('<strong/>').append(sentence)))
-              .append($('<p style="white-space: normal; margin: 10px 0px 10px 0px;"/>').append(
+                  $('<h3 style="white-space: normal;"/>').append(
+                      sentence))
+              .append($('<p style="white-space: normal;"/>').append(
                   meaning));
 
         const addTag = $('<a href="#" data-icon="plus"/>');

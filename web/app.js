@@ -17,6 +17,15 @@ app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'pug')
 app.set('views', __dirname + '/views');
 app.get('/', function(req, res) {
+    let example = ''
+    for (let k in req.query){
+        if (k == 'sentence'){
+            example = req.query[k];
+        }
+    }
+    if (example){
+        AddExample(jsonObjs, example);
+    }
     res.render('index');
 });
 app.get('/get_examples', function(req, res) {

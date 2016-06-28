@@ -44,7 +44,10 @@ function HandleWordResponse(data){
               .append($('<p style="white-space: normal;"/>').append(
                   meaning));
 
-        const addTag = $('<a href="#" data-icon="plus"/>');
+        const url = 'http://' + location.host
+            + '/?sentence=' + encodeURIComponent(sentence)
+            + '&meaning=' + encodeURIComponent(meaning);
+        const addTag = $('<a href="' + url + '" data-icon="plus" rel="external"/>');
 
         $('#id_examples').append(
             $('<li/>')

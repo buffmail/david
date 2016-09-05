@@ -124,6 +124,13 @@ function fnOnResExample(jsonData){
     $('#id_examples').listview('refresh');
 }
 
+function FilterExample(rawSentence){
+    let sentence = rawSentence.replace(/\*/g, '');
+    let retSentence =
+        sentence.replace(/\.  .*Kindle Edition.*/, '') + '.';
+    return retSentence;
+}
+
 $(document).ready(function(){
 
     socket.emit('req_example'
@@ -175,7 +182,7 @@ $(document).ready(function(){
 
     $('#id_btn_send_new_example').click(function(){
         const inputElem = $('#id_new_example');
-        const example = inputElem.val();
+        const example = FilterExample(inputElem.val());
         if (example.length == 0)
             return;
         socket.emit('add_example'

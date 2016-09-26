@@ -127,7 +127,7 @@ function fnOnResExample(jsonData){
 function FilterExample(rawSentence){
     let sentence = rawSentence.replace(/\*/g, '');
     let retSentence =
-        sentence.replace(/\.  .*Kindle Edition.*/, '');
+        sentence.replace(/\.\n\n.*Kindle Edition.*/, '');
     if (retSentence == sentence)
         return retSentence;
     return retSentence + '.';
